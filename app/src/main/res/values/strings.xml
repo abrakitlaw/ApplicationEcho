@@ -1,0 +1,61 @@
+<resources>
+    <string name="app_name">Echo</string>
+
+    <!--Welcome Page-->
+    <string name="sign_up">Sign Up</string>
+    <string name="log_in">Log In</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <!--Login Page-->
+    <string name="logo_description">This is echo logo</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_confirm_new_password">Confirm New Password</string>
+    <string name="hint_email">Email</string>
+    <string name="btn_sign_in">Sign In</string>
+    <string name="txt_view_sign_up"><u>Sign Up</u></string>
+    <string name="txt_view_forgot_pass"><u>Forgot Pass</u></string>
+
+    <!--Reset Password Page-->
+    <string name="btn_submit">Submit</string>
+    <string name="btn_confirm">Confirm</string>
+    <string name="title_forgot_pass">Forgot Your Pass?</string>
+    <string name="title_forgot_pass_confirm">Confirm your new password</string>
+    <string name="reset_pass_success">Reset Password sent to your Email</string>
+    <string name="reset_pass_failed">Please check your Email Address</string>
+    <string name="reset_pass_confirm_success">Confirm new password is successful</string>
+    <string name="reset_pass_confirm_failed">Please check your new password</string>
+
+
+    <!--Profile Page-->
+    <string name="profile_picture">Profile Picture</string>
+    <string name="btn_update">Update</string>
+    <string name="btn_edit">Edit</string>
+
+    <!--Register User Page-->
+    <string name="hint_birthday">Birthday</string>
+    <string name="hint_gender">Gender</string>
+    <string name="btn_sign_up">Sign up</string>
+
+
+    <!--Home-->
+    <string name="title_activity_main_home">Echo</string>
+
+    <!--User validation-->
+    <string name="email_isEmpty">Email is required</string>
+    <string name="email_invalid">Please enter a valid email</string>
+    <string name="username_isEmpty">Username is required</string>
+    <string name="username_minimum_length">Username length minimum should be 4 characters</string>
+    <string name="password_isEmpty">Password is required</string>
+    <string name="password_minimum_length">Password length minimum should be 6 characters</string>
+    <string name="user_register_success">Successfully Registered</string>
+    <string name="user_register_failed">Registration Failed</string>,
+    <string name="validation_failed">Please check your email and password</string>
+
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_sign_out">Sign Out</string>
+
+</resources>
