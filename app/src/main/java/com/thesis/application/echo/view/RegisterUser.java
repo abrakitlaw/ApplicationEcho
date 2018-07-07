@@ -20,7 +20,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.thesis.application.echo.R;
-import com.thesis.application.echo.model.User;
+import com.thesis.application.echo.models.User;
 
 public class RegisterUser extends AppCompatActivity implements View.OnClickListener {
 
@@ -77,12 +77,16 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
                     if (task.isSuccessful()) {
                         Toast.makeText(getApplicationContext(), getString(R.string.user_register_success), Toast.LENGTH_LONG).show();
 
-                        String idUser = dbRefUser.push().getKey();
+                        String idUser = "";
+                        if(userAuth.getCurrentUser() != null) {
+                            idUser = userAuth.getCurrentUser().getUid();
+                        }
+
                         User user = new User(idUser, usernameUser, emailUser, passwordUser);
                         dbRefUser.child(idUser).setValue(user);
 
                         finish();
-                        startActivity(new Intent(RegisterUser.this, Home.class));
+                        startActivity(new Intent(RegisterUser.this, MainHome.class));
                     } else {
                         Toast.makeText(getApplicationContext(), getString(R.string.user_register_failed), Toast.LENGTH_LONG).show();
 

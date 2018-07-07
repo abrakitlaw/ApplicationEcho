@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -17,6 +18,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.thesis.application.echo.R;
+import com.thesis.application.echo.models.User;
 import com.thesis.application.echo.view.Profile;
 
 /**
@@ -25,49 +27,70 @@ import com.thesis.application.echo.view.Profile;
 
 public class ProfileFragment extends android.support.v4.app.Fragment {
 
+    public static final String USER_ID = "userId";
 
     View view;
+
     FirebaseAuth mAuth;
     DatabaseReference dbRef;
+    FirebaseDatabase mFireBaseDatabase;
+    FirebaseUser firebaseUser;
 
-    String userName;
+    String email;
+    TextView txtUsername, txtEmail;
+
+    User user;
+    private String userId;
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        mFireBaseDatabase = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
+        dbRef = mFireBaseDatabase.getReference();
+        firebaseUser = mAuth.getCurrentUser();
 
-        final FirebaseUser firebaseUser;
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        final String uid = firebaseUser.getUid();
+        txtUsername = view.findViewById(R.id.textViewUsernameProfile);
+        txtEmail = view.findViewById(R.id.textViewEmailProfile);
+        email = firebaseUser.getEmail();
 
-
-        final TextView txtUsername = view.findViewById(R.id.textViewUsernameProfile);
-
-
-        dbRef = FirebaseDatabase.getInstance().getReference();
-        ValueEventListener userListener = new ValueEventListener() {
+        mFireBaseDatabase.getReference("users").orderByChild("email").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                userName = dataSnapshot.child(uid).child("username").getValue(String.class);
-                txtUsername.setText(userName);
+                for(DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    if(postSnapshot.exists()) {
+                        user = postSnapshot.getValue(User.class);
+                        String email = user.getEmail();
+                        String password = user.getPassword();
+                        userId = user.getUserId();
+                        String username = user.getUsername();
 
+                        Toast.makeText(getActivity().getApplicationContext(), email, Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent();
+                        intent.putExtra(USER_ID, userId);
+                        startActivity(intent);
+
+                        txtUsername.setText(username);
+                        txtEmail.setText(email);
+
+                    }
+                }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        };
-
-        dbRef.addValueEventListener(userListener);
-
+        });
 
         Button btnUpdate = view.findViewById(R.id.btnEditProfile);
         btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent intent = new Intent(getActivity().getApplicationContext(), Profile.class);
                 getActivity().startActivity(intent);
             }
@@ -81,7 +104,6 @@ public class ProfileFragment extends android.support.v4.app.Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getActivity().setTitle("Profile");
-
 
     }
 }

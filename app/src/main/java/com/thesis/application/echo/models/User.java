@@ -1,14 +1,14 @@
-package com.thesis.application.echo.model;
+package com.thesis.application.echo.models;
 
 /**
  * Created by Abra Kitlaw on 25-Jun-18.
  */
 
 public class User {
-    private String userId;
-    private String username;
-    private String email;
-    private String password;
+    public String userId;
+    public String username;
+    public String email;
+    public String password;
 
 
     public User() {
