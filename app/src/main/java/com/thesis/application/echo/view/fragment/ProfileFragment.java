@@ -36,37 +36,39 @@ public class ProfileFragment extends android.support.v4.app.Fragment {
     FirebaseDatabase mFireBaseDatabase;
     FirebaseUser firebaseUser;
 
-    String email;
     TextView txtUsername, txtEmail, txtFullName, txtGender;
 
-    User user;
-    private String userId;
+    private String currentUserId;
 
+    @Nullable
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        String currentEmail = mAuth.getCurrentUser().getEmail();
-        String currentUserId = mAuth.getCurrentUser().getUid();
-        txtEmail = view.findViewById(R.id.textViewEmailProfile);
-        txtEmail.setText(currentEmail);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        mAuth = FirebaseAuth.getInstance();
+        firebaseUser = mAuth.getCurrentUser();
+        currentUserId = mAuth.getCurrentUser().getUid();
+
+        dbRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUserId);
 
         txtUsername = view.findViewById(R.id.textViewUsernameProfile);
         txtFullName = view.findViewById(R.id.textViewFullnameProfile);
         txtGender = view.findViewById(R.id.textViewGenderProfile);
+        txtEmail = view.findViewById(R.id.textViewEmailProfile);
 
-        dbRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUserId);
-        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        dbRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    User user = snapshot.getValue(User.class);
-                    String gender = user.getGender();
-                    String fullname = user.getFullname();
-                    String username = user.getUsername();
+                if(dataSnapshot.exists()) {
+                    String username = dataSnapshot.child("username").getValue().toString();
+                    String fullname = dataSnapshot.child("fullname").getValue().toString();
+                    String gender = dataSnapshot.child("gender").getValue().toString();
+                    String email = mAuth.getCurrentUser().getEmail().trim();
 
                     txtUsername.setText(username);
                     txtFullName.setText(fullname);
                     txtGender.setText(gender);
+                    txtEmail.setText(email);
                 }
             }
 
@@ -75,21 +77,6 @@ public class ProfileFragment extends android.support.v4.app.Fragment {
 
             }
         });
-    }
-
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_profile, container, false);
-
-        mFireBaseDatabase = FirebaseDatabase.getInstance();
-        mAuth = FirebaseAuth.getInstance();
-        dbRef = mFireBaseDatabase.getReference();
-        firebaseUser = mAuth.getCurrentUser();
-
-        txtUsername = view.findViewById(R.id.textViewUsernameProfile);
-        txtEmail = view.findViewById(R.id.textViewEmailProfile);
 
         Button btnUpdate = view.findViewById(R.id.btnEditProfile);
         btnUpdate.setOnClickListener(new View.OnClickListener() {

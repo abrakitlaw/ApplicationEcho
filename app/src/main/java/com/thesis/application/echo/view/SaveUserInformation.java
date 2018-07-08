@@ -2,7 +2,9 @@ package com.thesis.application.echo.view;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +18,8 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,6 +30,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.thesis.application.echo.R;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 public class SaveUserInformation extends AppCompatActivity {
@@ -43,8 +48,11 @@ public class SaveUserInformation extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
 
+    private Uri imageUri;
+    private Uri downloadUrl;
+
     String currentUserId;
-    final static int gallery_pick = 1;
+    private static final int gallery_pick = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +66,6 @@ public class SaveUserInformation extends AppCompatActivity {
         currentUserId = firebaseUser.getUid();
 
         dbRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUserId);
-
-        currentUserId = mAuth.getCurrentUser().getUid();
 
         progressDialog = new ProgressDialog(this);
         editTextFullName = findViewById(R.id.editTextFullNameSaveUserInformation);
@@ -80,9 +86,9 @@ public class SaveUserInformation extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent galleryIntent = new Intent();
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
                 galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent, gallery_pick);
+                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(galleryIntent, "Select Profile Image"), gallery_pick);
             }
         });
     }
@@ -91,30 +97,32 @@ public class SaveUserInformation extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == gallery_pick && resultCode == RESULT_OK && data != null) {
-            Uri imageUri = data.getData();
-            StorageReference filePath = userProfileImageRef.child(currentUserId + ".jpg");
-            filePath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+        if(requestCode == gallery_pick && resultCode == RESULT_OK && data!= null && data.getData() != null) {
+            imageUri = data.getData();
+
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                profilePicture.setImageBitmap(bitmap);
+                uploadImageToStorage();
+            } catch (IOException e) {
+                Toast.makeText(this, "Error occurred: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+        }
+    }
+
+    private void uploadImageToStorage() {
+        StorageReference filePath = FirebaseStorage.getInstance().getReference().child("profile_pict/" + currentUserId + "_" + System.currentTimeMillis() + ".jpg");
+        if(imageUri != null) {
+            filePath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
-                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                    if(task.isSuccessful()) {
-                        Toast.makeText(SaveUserInformation.this, "Profile Picture is successfully updated", Toast.LENGTH_LONG).show();
-
-                        final String downloadURI = task.getResult().getDownloadUrl().toString();
-                        dbRef.child("profileImage").setValue(downloadURI).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if(task.isSuccessful()) {
-                                    Intent intent = new Intent(SaveUserInformation.this, SaveUserInformation.class);
-                                    startActivity(intent);
-                                    Toast.makeText(SaveUserInformation.this, "Profile image saved", Toast.LENGTH_SHORT).show();
-
-                                } else {
-                                    Toast.makeText(SaveUserInformation.this, "Error occurred: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        });
-                    }
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    downloadUrl = taskSnapshot.getDownloadUrl();
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(SaveUserInformation.this, "Error occurred: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -135,8 +143,8 @@ public class SaveUserInformation extends AppCompatActivity {
             progressDialog.setCanceledOnTouchOutside(true);
 
             HashMap<String, Object> userMap = new HashMap<>();
-            userMap.put("fullname", username);
-            userMap.put("username", fullname);
+            userMap.put("fullname", fullname);
+            userMap.put("username", username);
             userMap.put("gender", gender);
             dbRef.updateChildren(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
