@@ -39,7 +39,11 @@
         <activity android:name=".view.ResetPassword" />
         <activity android:name=".view.ResetPasswordConfirmation" />
         <activity android:name=".view.Profile" />
-        <activity android:name=".view.SaveUserInformation"></activity>
+        <activity android:name=".view.SaveUserInformation" />
+        <activity
+            android:name=".view.Post"
+            android:label="@string/title_activity_post"
+            android:theme="@style/myMainTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

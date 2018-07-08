@@ -1,6 +1,7 @@
 package com.thesis.application.echo.view;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -8,11 +9,16 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -20,21 +26,26 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.thesis.application.echo.R;
 import com.thesis.application.echo.models.User;
+import com.thesis.application.echo.view.fragment.ProfileFragment;
+
+import java.util.HashMap;
 
 import static com.thesis.application.echo.view.fragment.ProfileFragment.USER_ID;
 
-public class Profile extends AppCompatActivity implements View.OnClickListener{
+public class Profile extends AppCompatActivity {
 
-    EditText edtTxtUsername, edtTxtEmail, edtTxtPass, edtTxtConfirmPass;
+    EditText edtTxtUsername, edtTxtFullname, edtTxtEmail, edtTxtPass, edtTxtConfirmPass;
+    RadioGroup radioSexGroup;
+    RadioButton radioBtnSex;
 
     FirebaseAuth mAuth;
     FirebaseDatabase mFireBaseDatabase;
     FirebaseUser firebaseUser;
     DatabaseReference dbRef;
 
-    String userId;
-    User user;
-    String emailCurrentUser;
+    int selectedGender;
+    String currentUserId;
+    String currentUserEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,53 +57,111 @@ public class Profile extends AppCompatActivity implements View.OnClickListener{
         mFireBaseDatabase = FirebaseDatabase.getInstance();
         firebaseUser = mAuth.getCurrentUser();
 
-        emailCurrentUser = firebaseUser.getEmail();
+        currentUserId = mAuth.getCurrentUser().getUid();
+        currentUserEmail = mAuth.getCurrentUser().getEmail();
+
+
+        dbRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUserId);
 
         edtTxtUsername = findViewById(R.id.edtTxtUsernameUpdateProfile);
+        edtTxtFullname = findViewById(R.id.edtTxtFullnameUpdateProfile);
+        radioSexGroup = findViewById(R.id.radioGroupGenderEdit);
+        selectedGender = radioSexGroup.getCheckedRadioButtonId();
+        radioBtnSex = findViewById(selectedGender);
         edtTxtEmail = findViewById(R.id.edtTxtEmailUpdateProfile);
         edtTxtPass = findViewById(R.id.edtTxtPasswordUpdateProfile);
         edtTxtConfirmPass = findViewById(R.id.edtTxtConfirmPasswordUpdateProfile);
 
         Button btnUpdate = findViewById(R.id.btnUpdateProfile);
-        btnUpdate.setOnClickListener(this);
-
-        setTitle("Edit Profile");
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateUser();
+            }
+        });
     }
 
-
-
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btnUpdateProfile:
-                updateUser();
-                break;
-        }
+    protected void onStart() {
+        super.onStart();
+        loadUserInformation();
+    }
+
+    private void goToMainMenu() {
+        Intent intent = new Intent(getApplicationContext(), MainHome.class );
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void updateUser() {
-        Intent intent = new Intent();
-        Bundle bd = intent.getExtras();
+        String username = edtTxtUsername.getText().toString().trim();
+        String fullname = edtTxtFullname.getText().toString().trim();
+        final String email = edtTxtEmail.getText().toString();
+        int selectedGender = radioSexGroup.getCheckedRadioButtonId();
+        radioBtnSex = findViewById(selectedGender);
+        String gender = radioBtnSex.getText().toString();
+        String password = edtTxtPass.getText().toString();
+        final String confirmPass = edtTxtConfirmPass.getText().toString();
 
-        userId = bd.getString(USER_ID);
+        if(updateValidation(username, fullname, email, password, confirmPass)) {
+            HashMap<String, Object> userMapUpdate = new HashMap<>();
+            userMapUpdate.put("username", username);
+            userMapUpdate.put("fullname", fullname);
+            userMapUpdate.put("gender", gender);
 
+            dbRef.updateChildren(userMapUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        updateAuth(email, confirmPass);
+                        goToMainMenu();
+                        Toast.makeText(Profile.this, "Profile Successfully Updated", Toast.LENGTH_LONG).show();
 
-        final String username = edtTxtUsername.getText().toString().trim();
-        final String email = edtTxtEmail.getText().toString().trim();
-        final String password = edtTxtPass.getText().toString().trim();
-        final String confirmPass = edtTxtConfirmPass.getText().toString().trim();
+                    } else {
+                        Toast.makeText(Profile.this, "Error Occurred: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+
+        }
 
     }
 
-    private boolean updateValidation(String username, String email, String password, String confirmPass) {
-        username = edtTxtUsername.getText().toString().trim();
-        email = edtTxtEmail.getText().toString().trim();
-        password = edtTxtPass.getText().toString().trim();
-        confirmPass = edtTxtConfirmPass.getText().toString().trim();
+    private void updateAuth(String currentEmail, String confirmPass) {
+        FirebaseUser firebaseUserUpdate =  mAuth.getCurrentUser();
+        firebaseUserUpdate.updateEmail(currentEmail).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()) {
+
+                } else {
+                    Toast.makeText(getApplicationContext(), "Error occurred: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        firebaseUserUpdate.updatePassword(confirmPass).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()) {
+
+                } else {
+                    Toast.makeText(getApplicationContext(), "Error occurred: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    private boolean updateValidation(String username, String fullname, String email, String password, String confirmPass) {
 
         if(TextUtils.isEmpty(username)) {
             edtTxtUsername.setError(getString(R.string.username_isEmpty));
             edtTxtUsername.requestFocus();
+            return false;
+        }
+        if(TextUtils.isEmpty(fullname)) {
+            edtTxtFullname.setError(getString(R.string.full_name_is_empty));
+            edtTxtFullname.requestFocus();
             return false;
         }
         if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
@@ -120,6 +189,24 @@ public class Profile extends AppCompatActivity implements View.OnClickListener{
 
 
     private void loadUserInformation() {
+        dbRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()) {
+                    String username = dataSnapshot.child("username").getValue().toString();
+                    String fullname = dataSnapshot.child("fullname").getValue().toString();
 
+                    String email = currentUserEmail;
+
+                    edtTxtUsername.setText(username);
+                    edtTxtFullname.setText(fullname);
+                    edtTxtEmail.setText(email);
+                    }
+                }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }

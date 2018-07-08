@@ -23,10 +23,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="username"
+        android:hint="@string/hint_username"
         android:textAlignment="center"
         android:textAllCaps="false"
-
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -35,42 +34,45 @@
 
     <TextView
         android:id="@+id/textViewEmailProfile"
-        android:layout_width="wrap_content"
+        android:layout_width="259dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="8dp"
         android:ems="13"
-        android:textSize="16sp"
         android:hint="@string/hint_email"
-        android:textAlignment="center"
-        app:layout_constraintLeft_toLeftOf="parent"
+        android:textAlignment="textStart"
+        android:textSize="16sp"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textViewUsernameProfile" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewUsernameProfile" />
 
     <TextView
         android:id="@+id/textViewFullnameProfile"
-        android:layout_width="wrap_content"
+        android:layout_width="259dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="8dp"
         android:ems="13"
-        android:textSize="16sp"
         android:hint="@string/hint_full_name"
-        android:textAlignment="center"
-        app:layout_constraintLeft_toLeftOf="parent"
+        android:textAlignment="textStart"
+        android:textSize="16sp"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textViewEmailProfile" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewEmailProfile" />
 
     <TextView
         android:id="@+id/textViewGenderProfile"
-        android:layout_width="wrap_content"
+        android:layout_width="259dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="8dp"
         android:ems="13"
-        android:textSize="16sp"
         android:hint="@string/hind_gender"
-        android:textAlignment="center"
-        app:layout_constraintLeft_toLeftOf="parent"
+        android:textAlignment="textStart"
+        android:textSize="16sp"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textViewFullnameProfile" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewFullnameProfile" />
 
 
     <android.support.constraint.Guideline
@@ -82,15 +84,15 @@
 
     <Button
         android:id="@+id/btnEditProfile"
-        android:layout_width="wrap_content"
+        android:layout_width="134dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginTop="30dp"
         android:backgroundTint="@color/replyOrange"
         android:ems="7"
         android:text="@string/btn_edit"
         android:textAllCaps="false"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewGenderProfile" />
 
 </android.support.constraint.ConstraintLayout>

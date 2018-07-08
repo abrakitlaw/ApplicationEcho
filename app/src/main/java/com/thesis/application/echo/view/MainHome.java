@@ -2,7 +2,6 @@ package com.thesis.application.echo.view;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -11,7 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -21,10 +20,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.thesis.application.echo.R;
-import com.thesis.application.echo.models.User;
-import com.thesis.application.echo.view.fragment.ProfileFragment;
 
-import java.util.List;
+import com.thesis.application.echo.view.fragment.ProfileFragment;
 
 
 public class MainHome extends AppCompatActivity
@@ -34,12 +31,10 @@ public class MainHome extends AppCompatActivity
     DatabaseReference dbRef;
     FirebaseDatabase mFireBaseDatabase;
     FirebaseUser firebaseUser;
-    FirebaseAuth.AuthStateListener mAuthListener;
 
+    NavigationView navigationView;
 
-    List<User> users;
-    String email;
-
+    private static final int gallery_pick = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,15 +49,23 @@ public class MainHome extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
         mFireBaseDatabase = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
+        firebaseUser = mAuth.getCurrentUser();
+
         dbRef = mFireBaseDatabase.getReference().child("users");
 
+        navigationView = findViewById(R.id.nav_view);
+        //View navView = navigationView.inflateHeaderView(R.layout.nav_header_main_home);
+
+        navigationView.setNavigationItemSelectedListener(this);
         checkUserExistence();
 
+    }
+
+    private void goToProfile() {
+        Intent intent = new Intent(MainHome.this, ProfileFragment.class);
+        startActivity(intent);
     }
 
     @Override
@@ -121,6 +124,7 @@ public class MainHome extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_home, menu);
+        getMenuInflater().inflate(R.menu.main_post, menu);
         return true;
     }
 
@@ -132,11 +136,17 @@ public class MainHome extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_sign_out) {
             mAuth.signOut();
             Intent intent = new Intent(MainHome.this, Login.class);
             startActivity(intent);
             finish();
+            return true;
+        }
+        if (id == R.id.btnPost) {
+            Intent intent = new Intent(MainHome.this, Post.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
             return true;
         }
 
@@ -161,6 +171,13 @@ public class MainHome extends AppCompatActivity
             case R.id.nav_profile:
                 fragment = new ProfileFragment();
                 break;
+            case R.id.nav_home:
+                goToHome();
+                break;
+            case R.id.nav_trending:
+                break;
+            case R.id.nav_hoax:
+                break;
         }
 
         if(fragment != null) {
@@ -171,5 +188,18 @@ public class MainHome extends AppCompatActivity
 
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         drawerLayout.closeDrawer(GravityCompat.START);
+    }
+
+    private void goToHome() {
+        Intent intent = new Intent(getApplicationContext(), MainHome.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+    }
+
+    private void chooseFromGallery() {
+        Intent galleryIntent = new Intent();
+        galleryIntent.setType("image/*");
+        galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(galleryIntent, "Select Profile Image"), gallery_pick);
     }
 }
