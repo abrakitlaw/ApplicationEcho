@@ -40,6 +40,7 @@ public class Profile extends AppCompatActivity implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        setTitle("Edit Profile");
 
         mAuth = FirebaseAuth.getInstance();
         mFireBaseDatabase = FirebaseDatabase.getInstance();
@@ -81,17 +82,6 @@ public class Profile extends AppCompatActivity implements View.OnClickListener{
         final String password = edtTxtPass.getText().toString().trim();
         final String confirmPass = edtTxtConfirmPass.getText().toString().trim();
 
-        if(updateValidation(username, email, password, confirmPass)) {
-            user = new User(userId, username, email, confirmPass);
-            mFireBaseDatabase.getReference("users").child(userId).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    Toast.makeText(getApplicationContext(), "Profile Updated Successfully", Toast.LENGTH_LONG).show();
-                }
-            });
-
-
-        }
     }
 
     private boolean updateValidation(String username, String email, String password, String confirmPass) {
@@ -129,30 +119,7 @@ public class Profile extends AppCompatActivity implements View.OnClickListener{
     }
 
 
-    private User loadUserInformation() {
-        mFireBaseDatabase.getReference("users").orderByChild("email").equalTo(emailCurrentUser).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    if(postSnapshot.exists()) {
-                        user = postSnapshot.getValue(User.class);
-                        String email = user.getEmail();
-                        String password = user.getPassword();
-                        String userId = user.getUserId();
-                        String username = user.getUsername();
+    private void loadUserInformation() {
 
-                        Toast.makeText(getApplicationContext(), user.getUserId(), Toast.LENGTH_LONG).show();
-
-                    }
-                }
-            }
-
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        return user;
     }
 }

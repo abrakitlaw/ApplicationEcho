@@ -60,7 +60,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         if(mAuth.getCurrentUser() != null) {
             finish();
             Intent intent = new Intent(this, MainHome.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
+            finish();
         }
     }
 

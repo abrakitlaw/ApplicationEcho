@@ -25,10 +25,10 @@ import com.thesis.application.echo.models.User;
 public class RegisterUser extends AppCompatActivity implements View.OnClickListener {
 
     private ProgressBar progressBarRegister;
-    private EditText email, username, password;
+    private EditText email, password;
 
     private DatabaseReference dbRefUser;
-    private FirebaseAuth userAuth;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,14 +37,11 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
 
         dbRefUser = FirebaseDatabase.getInstance().getReference("users");
 
-        userAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
         progressBarRegister = findViewById(R.id.progressBarRegister);
         email = findViewById(R.id.editTextEmailSignUp);
         onFocusChangeListener(email);
-
-        username = findViewById(R.id.editTextUsernameSignUp);
-        onFocusChangeListener(username);
 
         password = findViewById(R.id.editTextPasswordSignUp);
         onFocusChangeListener(password);
@@ -52,6 +49,15 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btnRegister).setOnClickListener(this);
 
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(mAuth.getCurrentUser() != null) {
+           goToMainHome();
+        }
     }
 
     @Override
@@ -66,32 +72,20 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
     private void addUser() {
         final String emailUser = email.getText().toString().trim();
         final String passwordUser = password.getText().toString().trim();
-        final String usernameUser = username.getText().toString().trim();
 
-        if (userRegisterValidation()) {
+        if (userRegisterValidation(emailUser, passwordUser)) {
             progressBarRegister.setVisibility(View.VISIBLE);
-            userAuth.createUserWithEmailAndPassword(emailUser, passwordUser).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            mAuth.createUserWithEmailAndPassword(emailUser, passwordUser).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     progressBarRegister.setVisibility(View.GONE);
                     if (task.isSuccessful()) {
-                        Toast.makeText(getApplicationContext(), getString(R.string.user_register_success), Toast.LENGTH_LONG).show();
-
-                        String idUser = "";
-                        if(userAuth.getCurrentUser() != null) {
-                            idUser = userAuth.getCurrentUser().getUid();
-                        }
-
-                        User user = new User(idUser, usernameUser, emailUser, passwordUser);
-                        dbRefUser.child(idUser).setValue(user);
-
-                        finish();
-                        startActivity(new Intent(RegisterUser.this, MainHome.class));
+                        goToMainHome();
                     } else {
                         Toast.makeText(getApplicationContext(), getString(R.string.user_register_failed), Toast.LENGTH_LONG).show();
 
                         if (task.getException() instanceof FirebaseAuthUserCollisionException) {
-                            Toast.makeText(getApplicationContext(), "You are already registered", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Error Occurred: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -99,10 +93,16 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private boolean userRegisterValidation() {
-        String emailInputted = email.getText().toString().trim();
-        String usernameInputted = username.getText().toString().trim();
-        String passwordInputted = password.getText().toString().trim();
+    private void goToMainHome() {
+        Intent intent = new Intent(RegisterUser.this, MainHome.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    private boolean userRegisterValidation(String emailInputted, String passwordInputted) {
+        emailInputted = email.getText().toString().trim();
+        passwordInputted = password.getText().toString().trim();
         if (emailInputted.isEmpty()) {
             email.setError(getString(R.string.email_isEmpty));
             email.requestFocus();
@@ -111,16 +111,6 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
         if (!Patterns.EMAIL_ADDRESS.matcher(emailInputted).matches()) {
             email.setError(getString(R.string.email_invalid));
             email.requestFocus();
-            return false;
-        }
-        if (usernameInputted.isEmpty()) {
-            username.setError(getString(R.string.username_isEmpty));
-            username.requestFocus();
-            return false;
-        }
-        if (usernameInputted.length() < 4) {
-            username.setError(getString(R.string.username_minimum_length));
-            username.requestFocus();
             return false;
         }
         if (passwordInputted.isEmpty()) {

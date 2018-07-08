@@ -1,59 +1,58 @@
 package com.thesis.application.echo.models;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
+import java.util.Date;
+
 /**
  * Created by Abra Kitlaw on 25-Jun-18.
  */
 
+@IgnoreExtraProperties
 public class User {
-    public String userId;
     public String username;
-    public String email;
-    public String password;
-
+    public String fullname;
+    public String gender;
 
     public User() {
     }
 
-    public User(String userId, String username, String email, String password) {
-        this.userId = userId;
+    public User(String username, String fullname, String gender) {
         this.username = username;
-        this.email = email;
-        this.password = password;
+        this.fullname = fullname;
+        this.gender = gender;
     }
 
-    public User(String password) {
-        this.password = password;
+    public String getFullname() {
+        return fullname;
     }
 
-    public String getUserId() {
-        return userId;
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
+    }
+
+    public String getBirthdate() {
+        return gender;
+    }
+
+    public void setBirthdate(String birthdate) {
+        this.gender = birthdate;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     public void setUsername(String username) {
         this.username = username;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public String getGender() {
+        return gender;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setGender(String gender) {
+        this.gender = gender;
     }
+
 }

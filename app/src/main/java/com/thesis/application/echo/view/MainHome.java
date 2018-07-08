@@ -59,28 +59,52 @@ public class MainHome extends AppCompatActivity
 
         mFireBaseDatabase = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
-        dbRef = mFireBaseDatabase.getReference();
+        dbRef = mFireBaseDatabase.getReference().child("users");
 
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
+        checkUserExistence();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        FirebaseUser curUser = mAuth.getCurrentUser();
+
+        if(curUser == null) {
+            goToLogin();
+        }
+    }
+
+    private void checkUserExistence() {
+        final String currentUserId = mAuth.getCurrentUser().getUid();
+        dbRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                firebaseUser = mAuth.getCurrentUser();
-                if(firebaseUser != null) {
-                    String userId = firebaseUser.getUid();
-
-                    mFireBaseDatabase.getReference("users").child("userId").equalTo(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                    Toast.makeText(MainHome.this, dataSnapshot.getValue().toString(),Toast.LENGTH_LONG ).show();
-                        }
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.hasChild(currentUserId)) {
+                    goToSaveUserInformation();
                 }
             }
-        };
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void goToSaveUserInformation() {
+        Intent intent = new Intent(MainHome.this, SaveUserInformation.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    private void goToLogin() {
+        Intent intent = new Intent(MainHome.this, Login.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     @Override

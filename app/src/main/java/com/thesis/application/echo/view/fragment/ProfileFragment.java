@@ -37,10 +37,45 @@ public class ProfileFragment extends android.support.v4.app.Fragment {
     FirebaseUser firebaseUser;
 
     String email;
-    TextView txtUsername, txtEmail;
+    TextView txtUsername, txtEmail, txtFullName, txtGender;
 
     User user;
     private String userId;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        String currentEmail = mAuth.getCurrentUser().getEmail();
+        String currentUserId = mAuth.getCurrentUser().getUid();
+        txtEmail = view.findViewById(R.id.textViewEmailProfile);
+        txtEmail.setText(currentEmail);
+
+        txtUsername = view.findViewById(R.id.textViewUsernameProfile);
+        txtFullName = view.findViewById(R.id.textViewFullnameProfile);
+        txtGender = view.findViewById(R.id.textViewGenderProfile);
+
+        dbRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUserId);
+        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    User user = snapshot.getValue(User.class);
+                    String gender = user.getGender();
+                    String fullname = user.getFullname();
+                    String username = user.getUsername();
+
+                    txtUsername.setText(username);
+                    txtFullName.setText(fullname);
+                    txtGender.setText(gender);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 
 
     @Nullable
@@ -55,36 +90,6 @@ public class ProfileFragment extends android.support.v4.app.Fragment {
 
         txtUsername = view.findViewById(R.id.textViewUsernameProfile);
         txtEmail = view.findViewById(R.id.textViewEmailProfile);
-        email = firebaseUser.getEmail();
-
-        mFireBaseDatabase.getReference("users").orderByChild("email").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    if(postSnapshot.exists()) {
-                        user = postSnapshot.getValue(User.class);
-                        String email = user.getEmail();
-                        String password = user.getPassword();
-                        userId = user.getUserId();
-                        String username = user.getUsername();
-
-                        Toast.makeText(getActivity().getApplicationContext(), email, Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent();
-                        intent.putExtra(USER_ID, userId);
-                        startActivity(intent);
-
-                        txtUsername.setText(username);
-                        txtEmail.setText(email);
-
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
         Button btnUpdate = view.findViewById(R.id.btnEditProfile);
         btnUpdate.setOnClickListener(new View.OnClickListener() {
@@ -106,4 +111,6 @@ public class ProfileFragment extends android.support.v4.app.Fragment {
         getActivity().setTitle("Profile");
 
     }
+
+
 }
