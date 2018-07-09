@@ -1,5 +1,7 @@
 package com.thesis.application.echo.view;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -22,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.thesis.application.echo.R;
 
 import com.thesis.application.echo.view.fragment.ProfileFragment;
+import com.thesis.application.echo.view.fragment.TrendingFragment;
 
 
 public class MainHome extends AppCompatActivity
@@ -166,15 +169,17 @@ public class MainHome extends AppCompatActivity
 
     private void displaySelectedScreen(int itemId) {
         android.support.v4.app.Fragment fragment = null;
+        Context context = this.getApplicationContext();
 
         switch (itemId) {
             case R.id.nav_profile:
                 fragment = new ProfileFragment();
                 break;
             case R.id.nav_home:
-                goToHome();
+                    goToHome();
                 break;
             case R.id.nav_trending:
+                fragment = new TrendingFragment();
                 break;
             case R.id.nav_hoax:
                 break;

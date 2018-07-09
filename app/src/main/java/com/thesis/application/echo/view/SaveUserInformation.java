@@ -52,7 +52,7 @@ public class SaveUserInformation extends AppCompatActivity {
     private Uri downloadUrl;
 
     String currentUserId;
-    private static final int gallery_pick = 101;
+    private static final int GALLERY_PICK = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +88,7 @@ public class SaveUserInformation extends AppCompatActivity {
                 Intent galleryIntent = new Intent();
                 galleryIntent.setType("image/*");
                 galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(galleryIntent, "Select Profile Image"), gallery_pick);
+                startActivityForResult(Intent.createChooser(galleryIntent, "Select Profile Image"), GALLERY_PICK);
             }
         });
     }
@@ -97,7 +97,7 @@ public class SaveUserInformation extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == gallery_pick && resultCode == RESULT_OK && data!= null && data.getData() != null) {
+        if(requestCode == GALLERY_PICK && resultCode == RESULT_OK && data!= null && data.getData() != null) {
             imageUri = data.getData();
 
             try {
