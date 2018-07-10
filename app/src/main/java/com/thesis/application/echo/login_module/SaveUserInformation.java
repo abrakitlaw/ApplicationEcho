@@ -1,4 +1,4 @@
-package com.thesis.application.echo.view;
+package com.thesis.application.echo.login_module;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -29,6 +29,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.thesis.application.echo.R;
+import com.thesis.application.echo.main_home_module.MainHome;
 
 import java.io.IOException;
 import java.util.HashMap;

@@ -29,19 +29,19 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".view.Login" />
-        <activity android:name=".view.RegisterUser" />
-        <activity android:name=".view.Home" />
+        <activity android:name=".login_module.Login" />
+        <activity android:name=".login_module.RegisterUser" />
+        <activity android:name=".Home" />
         <activity
-            android:name=".view.MainHome"
+            android:name=".main_home_module.MainHome"
             android:label="@string/title_activity_main_home"
             android:theme="@style/Theme.Design.Light.NoActionBar" />
-        <activity android:name=".view.ResetPassword" />
-        <activity android:name=".view.ResetPasswordConfirmation" />
-        <activity android:name=".view.Profile" />
-        <activity android:name=".view.SaveUserInformation" />
+        <activity android:name=".login_module.ResetPassword" />
+        <activity android:name=".login_module.ResetPasswordConfirmation" />
+        <activity android:name=".profile_module.Profile" />
+        <activity android:name=".login_module.SaveUserInformation" />
         <activity
-            android:name=".view.Post"
+            android:name=".post_module.Post"
             android:label="@string/title_activity_post"
             android:theme="@style/myMainTheme.NoActionBar"></activity>
     </application>

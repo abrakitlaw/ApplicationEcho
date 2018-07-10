@@ -6,46 +6,47 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.thesis.application.echo.view.Post">
+    tools:context="com.thesis.application.echo.post_module.Post">
 
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbar"
+        android:id="@+id/appbarPost"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/appbar_padding_top"
-        android:theme="@style/myMainTheme.AppBarOverlay">
+        android:theme="@style/Base.Widget.AppCompat.Light.ActionBar.TabBar"
+        android:backgroundTint="@color/colorPrimaryDark">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        <Toolbar
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_weight="1"
-            android:background="?attr/colorPrimary"
-            app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/myMainTheme.PopupOverlay"
-            app:title="@string/app_name">
+            android:layout_height="match_parent"
+            android:title="@string/title_post"
+            android:background="@color/colorPrimary">
 
-        </android.support.v7.widget.Toolbar>
+        </Toolbar>
+
+
 
         <android.support.design.widget.TabLayout
-            android:id="@+id/tabs"
+            android:id="@+id/tabsPost"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:tabBackground="@color/colorPrimary"
+            app:tabSelectedTextColor="@color/replyOrange"
+            app:tabIndicatorColor="@color/replyOrange">
 
             <android.support.design.widget.TabItem
-                android:id="@+id/tabItem"
+                android:id="@+id/tabGallery"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Gallery" />
 
             <android.support.design.widget.TabItem
-                android:id="@+id/tabItem2"
+                android:id="@+id/tabTakePhoto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Photo" />
 
             <android.support.design.widget.TabItem
-                android:id="@+id/tabItem3"
+                android:id="@+id/tabURL"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="URL" />
@@ -57,6 +58,7 @@
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/white"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </android.support.design.widget.CoordinatorLayout>

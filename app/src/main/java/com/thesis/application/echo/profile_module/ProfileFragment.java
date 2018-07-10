@@ -1,4 +1,4 @@
-package com.thesis.application.echo.view.fragment;
+package com.thesis.application.echo.profile_module;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -18,8 +17,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.thesis.application.echo.R;
-import com.thesis.application.echo.models.User;
-import com.thesis.application.echo.view.Profile;
+import com.thesis.application.echo.profile_module.Profile;
 
 /**
  * Created by Abra Kitlaw on 05-Jul-18.

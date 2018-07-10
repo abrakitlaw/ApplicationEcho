@@ -7,9 +7,9 @@ import android.view.View;
 import android.widget.Button;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.thesis.application.echo.view.Login;
-import com.thesis.application.echo.view.MainHome;
-import com.thesis.application.echo.view.RegisterUser;
+import com.thesis.application.echo.login_module.Login;
+import com.thesis.application.echo.main_home_module.MainHome;
+import com.thesis.application.echo.login_module.RegisterUser;
 
 public class WelcomePage extends AppCompatActivity implements View.OnClickListener{
 

@@ -1,4 +1,4 @@
-package com.thesis.application.echo.view;
+package com.thesis.application.echo.login_module;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -20,6 +20,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.thesis.application.echo.R;
+import com.thesis.application.echo.main_home_module.MainHome;
 
 public class Login extends AppCompatActivity implements View.OnClickListener {
 

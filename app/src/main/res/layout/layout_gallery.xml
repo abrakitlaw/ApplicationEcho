@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <ScrollView
+        android:id="@+id/scrollViewShareYourStory"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/btnImageSelect"
+                android:layout_width="411dp"
+                android:layout_height="285dp"
+                android:layout_marginEnd="0dp"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="0dp"
+                android:contentDescription="@string/select_a_image"
+                android:cropToPadding="true"
+                android:orientation="vertical"
+                android:scaleType="center"
+                android:src="@drawable/ic_image_black_24dp"
+                android:focusable="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/titleTextShareYourStory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:text="Share your story"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                app:layout_constraintTop_toBottomOf="@id/btnImageSelect"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <ScrollView
+                android:id="@+id/scrollViewEditYourStory"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginTop="5dp"
+                app:layout_constraintTop_toBottomOf="@id/titleTextShareYourStory">
+
+                <EditText
+                    android:id="@+id/editTextShareYourStory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="8dp"
+                    android:ems="10"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:cursorVisible="false"
+                    android:inputType="textMultiLine"
+                    android:labelFor="@+id/editText2"
+                    android:scrollbars="vertical"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/selectImagePost" />
+
+            </ScrollView>
+
+            <Button
+                android:id="@+id/btnPostGallery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/replyOrange"
+                android:ems="9"
+                android:layout_marginTop="20dp"
+                android:text="Post"
+                android:textAllCaps="false"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/scrollViewEditYourStory" />
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
+
+</android.support.constraint.ConstraintLayout>

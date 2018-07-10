@@ -1,6 +1,5 @@
-package com.thesis.application.echo.view;
+package com.thesis.application.echo.main_home_module;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,8 +22,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.thesis.application.echo.R;
 
-import com.thesis.application.echo.view.fragment.ProfileFragment;
-import com.thesis.application.echo.view.fragment.TrendingFragment;
+import com.thesis.application.echo.login_module.Login;
+import com.thesis.application.echo.login_module.SaveUserInformation;
+import com.thesis.application.echo.profile_module.ProfileFragment;
+import com.thesis.application.echo.post_module.Post;
 
 
 public class MainHome extends AppCompatActivity

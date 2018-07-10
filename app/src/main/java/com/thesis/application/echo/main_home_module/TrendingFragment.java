@@ -1,4 +1,4 @@
-package com.thesis.application.echo.view.fragment;
+package com.thesis.application.echo.main_home_module;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

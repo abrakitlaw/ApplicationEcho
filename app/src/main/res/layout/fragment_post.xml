@@ -4,7 +4,8 @@
     android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.thesis.application.echo.view.Post$PlaceholderFragment">
+    android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+    tools:context="com.thesis.application.echo.post_module.Post$PlaceholderFragment">
 
 
     <TextView

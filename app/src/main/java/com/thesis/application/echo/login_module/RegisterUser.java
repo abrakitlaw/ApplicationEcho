@@ -1,4 +1,4 @@
-package com.thesis.application.echo.view;
+package com.thesis.application.echo.login_module;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -20,7 +20,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.thesis.application.echo.R;
-import com.thesis.application.echo.models.User;
+import com.thesis.application.echo.main_home_module.MainHome;
 
 public class RegisterUser extends AppCompatActivity implements View.OnClickListener {
 

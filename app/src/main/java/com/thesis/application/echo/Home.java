@@ -1,4 +1,4 @@
-package com.thesis.application.echo.view;
+package com.thesis.application.echo;
 
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;

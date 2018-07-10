@@ -1,4 +1,4 @@
-package com.thesis.application.echo.view;
+package com.thesis.application.echo.login_module;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -22,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.thesis.application.echo.R;
+import com.thesis.application.echo.main_home_module.MainHome;
 
 public class ResetPasswordConfirmation extends AppCompatActivity implements View.OnClickListener{
 
