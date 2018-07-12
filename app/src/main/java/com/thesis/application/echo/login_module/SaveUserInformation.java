@@ -30,16 +30,19 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.thesis.application.echo.R;
 import com.thesis.application.echo.main_home_module.MainHome;
+import com.thesis.application.echo.models.User;
 
 import java.io.IOException;
 import java.util.HashMap;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class SaveUserInformation extends AppCompatActivity {
 
     private EditText editTextFullName, editTextUsername;
     private RadioGroup radioGender;
     private RadioButton radioButton;
-    private ImageView profilePicture;
+    private CircleImageView profilePicture;
 
     private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
@@ -54,6 +57,7 @@ public class SaveUserInformation extends AppCompatActivity {
 
     String currentUserId;
     private static final int GALLERY_PICK = 1001;
+    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +70,7 @@ public class SaveUserInformation extends AppCompatActivity {
         firebaseUser = mAuth.getCurrentUser();
         currentUserId = firebaseUser.getUid();
 
-        dbRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUserId);
+        dbRef = FirebaseDatabase.getInstance().getReference().child("users");
 
         progressDialog = new ProgressDialog(this);
         editTextFullName = findViewById(R.id.editTextFullNameSaveUserInformation);
@@ -112,14 +116,17 @@ public class SaveUserInformation extends AppCompatActivity {
 
     private void uploadImageToStorage() {
         if(imageUri != null) {
-            StorageReference filePath = userProfileImageRef.child("ProfileImage").child(currentUserId + "_" + System.currentTimeMillis() + ".jpg");
+            StorageReference filePath = userProfileImageRef.child("ProfileImage").child(imageUri.getLastPathSegment() + "_" + username + "_" + System.currentTimeMillis() + ".jpg");
             filePath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                     if (task.isSuccessful()) {
                         downloadUrl = task.getResult().getDownloadUrl().toString();
-                        saveUserInfo();
+                        saveUserInfo(downloadUrl);
+                        goToMainHome();
+                        progressDialog.dismiss();
                     } else {
+                        progressDialog.dismiss();
                         Toast.makeText(SaveUserInformation.this, "Error occurred: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -130,9 +137,9 @@ public class SaveUserInformation extends AppCompatActivity {
 
     }
 
-    private void saveUserInfo() {
+    private void saveUserInfo(String downloadUrl) {
         String fullname = editTextFullName.getText().toString();
-        String username = editTextUsername.getText().toString();
+        username = editTextUsername.getText().toString();
 
         int selectedGender = radioGender.getCheckedRadioButtonId();
         radioButton = findViewById(selectedGender);
@@ -144,21 +151,14 @@ public class SaveUserInformation extends AppCompatActivity {
             progressDialog.show();
             progressDialog.setCanceledOnTouchOutside(true);
 
-            HashMap<String, Object> userMap = new HashMap<>();
-            userMap.put("fullname", fullname);
-            userMap.put("username", username);
-            userMap.put("gender", gender);
-            userMap.put("profilePictUrl", downloadUrl);
-            dbRef.updateChildren(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            HashMap<String, User> userMap = new HashMap<>();
+            userMap.put(currentUserId, new User(username, fullname, gender, downloadUrl));
+            dbRef.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()) {
-                        uploadImageToStorage();
                         Toast.makeText(SaveUserInformation.this, "Your Account Successfully Registered", Toast.LENGTH_LONG).show();
-                        goToMainHome();
-                        progressDialog.dismiss();
                     } else {
-                        progressDialog.dismiss();
                         Toast.makeText(SaveUserInformation.this,  "Error occurred: " + task.getException().getMessage(),Toast.LENGTH_LONG).show();
                     }
                 }
@@ -169,7 +169,6 @@ public class SaveUserInformation extends AppCompatActivity {
 
     private void goToMainHome() {
         Intent intent = new Intent(SaveUserInformation.this, MainHome.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }

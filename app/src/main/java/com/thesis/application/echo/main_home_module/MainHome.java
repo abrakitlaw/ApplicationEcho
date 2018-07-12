@@ -38,8 +38,6 @@ public class MainHome extends AppCompatActivity
 
     NavigationView navigationView;
 
-    private static final int gallery_pick = 101;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,8 +61,6 @@ public class MainHome extends AppCompatActivity
         //View navView = navigationView.inflateHeaderView(R.layout.nav_header_main_home);
 
         navigationView.setNavigationItemSelectedListener(this);
-        checkUserExistence();
-
     }
 
     private void goToProfile() {
@@ -80,6 +76,9 @@ public class MainHome extends AppCompatActivity
 
         if(curUser == null) {
             goToLogin();
+        }
+        if(curUser != null) {
+            checkUserExistence();
         }
     }
 
@@ -102,7 +101,6 @@ public class MainHome extends AppCompatActivity
 
     private void goToSaveUserInformation() {
         Intent intent = new Intent(MainHome.this, SaveUserInformation.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
@@ -200,12 +198,5 @@ public class MainHome extends AppCompatActivity
         Intent intent = new Intent(getApplicationContext(), MainHome.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-    }
-
-    private void chooseFromGallery() {
-        Intent galleryIntent = new Intent();
-        galleryIntent.setType("image/*");
-        galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(galleryIntent, "Select Profile Image"), gallery_pick);
     }
 }

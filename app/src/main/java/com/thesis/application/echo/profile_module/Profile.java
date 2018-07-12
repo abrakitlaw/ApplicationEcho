@@ -87,7 +87,7 @@ public class Profile extends AppCompatActivity {
         btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                uploadPictureToFireBaseStorage();
+                updateUser();
             }
         });
 
@@ -158,14 +158,14 @@ public class Profile extends AppCompatActivity {
             userMapUpdate.put("username", username);
             userMapUpdate.put("fullname", fullname);
             userMapUpdate.put("gender", gender);
-            userMapUpdate.put("profilePictUrl", downloadUrl);
 
             dbRef.updateChildren(userMapUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
                         updateAuth(email, confirmPass);
-
+                        Toast.makeText(Profile.this, "Profile Successfully Updated", Toast.LENGTH_LONG).show();
+                        goToMainMenu();
                     } else {
                         Toast.makeText(Profile.this, "Error Occurred: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
@@ -245,7 +245,7 @@ public class Profile extends AppCompatActivity {
                     String profilePict = dataSnapshot.child("profilePictUrl").getValue().toString();
                     String email = currentUserEmail;
 
-                    Picasso.get().load(profilePict).into(imageViewProfile);
+                    Picasso.get().load(profilePict).placeholder(R.drawable.ic_male_user_profile_picture).into(imageViewProfile);
                     edtTxtUsername.setText(username);
                     edtTxtFullname.setText(fullname);
                     edtTxtEmail.setText(email);

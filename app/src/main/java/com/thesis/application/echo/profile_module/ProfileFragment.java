@@ -32,6 +32,8 @@ import com.thesis.application.echo.profile_module.Profile;
 
 import java.util.HashMap;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 /**
  * Created by Abra Kitlaw on 05-Jul-18.
  */
@@ -50,7 +52,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment {
     StorageReference profilePictRef;
 
     TextView txtUsername, txtEmail, txtFullName, txtGender;
-    ImageView profilePicture;
+    CircleImageView profilePicture;
 
     Uri imageUri;
     String downloadUrl;
@@ -67,7 +69,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment {
         firebaseUser = mAuth.getCurrentUser();
         currentUserId = mAuth.getCurrentUser().getUid();
 
-        dbRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUserId);
+        dbRef = FirebaseDatabase.getInstance().getReference().child("users");
 
         profilePicture = view.findViewById(R.id.profilePicture);
         txtUsername = view.findViewById(R.id.textViewUsernameProfile);
@@ -132,7 +134,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment {
         HashMap<String, Object> updateProfilePictUrlMap = new HashMap<>();
         updateProfilePictUrlMap.put("profilePictUrl", downloadUrl);
 
-        dbRef.updateChildren(updateProfilePictUrlMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+        dbRef.child(currentUserId).updateChildren(updateProfilePictUrlMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
@@ -146,7 +148,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment {
 
 
     private void loadUserInformationProfile() {
-        dbRef.addValueEventListener(new ValueEventListener() {
+        dbRef.child(currentUserId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()) {
@@ -156,7 +158,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment {
                     String gender = dataSnapshot.child("gender").getValue().toString();
                     String email = mAuth.getCurrentUser().getEmail().trim();
 
-                    Picasso.get().load(profilePictUrl).placeholder(R.drawable.ic_launcher_background).into(profilePicture);
+                    Picasso.get().load(profilePictUrl).placeholder(R.drawable.ic_male_user_profile_picture).into(profilePicture);
                     txtUsername.setText(username);
                     txtFullName.setText(fullname);
                     txtGender.setText(gender);
