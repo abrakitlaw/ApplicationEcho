@@ -50,7 +50,7 @@ public class SaveUserInformation extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     private Uri imageUri;
-    private Uri downloadUrl;
+    private String downloadUrl;
 
     String currentUserId;
     private static final int GALLERY_PICK = 1001;
@@ -60,7 +60,7 @@ public class SaveUserInformation extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_save_user_information);
 
-        userProfileImageRef = FirebaseStorage.getInstance().getReference().child("Profile Images");
+        userProfileImageRef = FirebaseStorage.getInstance().getReference();
 
         mAuth = FirebaseAuth.getInstance();
         firebaseUser = mAuth.getCurrentUser();
@@ -76,57 +76,58 @@ public class SaveUserInformation extends AppCompatActivity {
 
         Button btnSave = findViewById(R.id.btnSaveUserInformation);
 
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveUserInfo();
-            }
-        });
-
         profilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent galleryIntent = new Intent();
-                galleryIntent.setType("image/*");
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(galleryIntent, "Select Profile Image"), GALLERY_PICK);
+                openGallery();
+
             }
         });
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                uploadImageToStorage();
+            }
+        });
+    }
+
+    private void openGallery() {
+        Intent galleryIntent = new Intent();
+        galleryIntent.setType("image/*");
+        galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(galleryIntent, "Select Profile Image"), GALLERY_PICK);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == GALLERY_PICK && resultCode == RESULT_OK && data!= null && data.getData() != null) {
+        if(requestCode == GALLERY_PICK && resultCode == RESULT_OK && data!= null) {
             imageUri = data.getData();
-
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                profilePicture.setImageBitmap(bitmap);
-                uploadImageToStorage();
-            } catch (IOException e) {
-                Toast.makeText(this, "Error occurred: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            }
+            profilePicture.setImageURI(imageUri);
 
         }
     }
 
     private void uploadImageToStorage() {
-        StorageReference filePath = FirebaseStorage.getInstance().getReference().child("profile_pict/" + currentUserId + "_" + System.currentTimeMillis() + ".jpg");
         if(imageUri != null) {
-            filePath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            StorageReference filePath = userProfileImageRef.child("ProfileImage").child(currentUserId + "_" + System.currentTimeMillis() + ".jpg");
+            filePath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    downloadUrl = taskSnapshot.getDownloadUrl();
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(SaveUserInformation.this, "Error occurred: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        downloadUrl = task.getResult().getDownloadUrl().toString();
+                        saveUserInfo();
+                    } else {
+                        Toast.makeText(SaveUserInformation.this, "Error occurred: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
+        } else {
+            Toast.makeText(SaveUserInformation.this, "Please select your profile picture", Toast.LENGTH_SHORT).show();
         }
+
     }
 
     private void saveUserInfo() {
@@ -147,13 +148,15 @@ public class SaveUserInformation extends AppCompatActivity {
             userMap.put("fullname", fullname);
             userMap.put("username", username);
             userMap.put("gender", gender);
+            userMap.put("profilePictUrl", downloadUrl);
             dbRef.updateChildren(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()) {
+                        uploadImageToStorage();
+                        Toast.makeText(SaveUserInformation.this, "Your Account Successfully Registered", Toast.LENGTH_LONG).show();
                         goToMainHome();
                         progressDialog.dismiss();
-                        Toast.makeText(SaveUserInformation.this, "Your Account Successfully Registered", Toast.LENGTH_LONG).show();
                     } else {
                         progressDialog.dismiss();
                         Toast.makeText(SaveUserInformation.this,  "Error occurred: " + task.getException().getMessage(),Toast.LENGTH_LONG).show();

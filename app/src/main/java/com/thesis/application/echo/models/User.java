@@ -13,14 +13,16 @@ public class User {
     public String username;
     public String fullname;
     public String gender;
+    public String profilePictUrl;
 
     public User() {
     }
 
-    public User(String username, String fullname, String gender) {
+    public User(String username, String fullname, String gender, String profilePictUrl) {
         this.username = username;
         this.fullname = fullname;
         this.gender = gender;
+        this.profilePictUrl = profilePictUrl;
     }
 
     public String getFullname() {
@@ -29,14 +31,6 @@ public class User {
 
     public void setFullname(String fullname) {
         this.fullname = fullname;
-    }
-
-    public String getBirthdate() {
-        return gender;
-    }
-
-    public void setBirthdate(String birthdate) {
-        this.gender = birthdate;
     }
 
     public String getUsername() {
@@ -53,6 +47,14 @@ public class User {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public String getProfilePictUrl() {
+        return profilePictUrl;
+    }
+
+    public void setProfilePictUrl(String profilePictUrl) {
+        this.profilePictUrl = profilePictUrl;
     }
 
 }

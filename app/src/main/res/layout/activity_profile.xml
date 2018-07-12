@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/myMainTheme.NoActionBar"
     tools:context="com.thesis.application.echo.profile_module.Profile">
 
     <ImageView

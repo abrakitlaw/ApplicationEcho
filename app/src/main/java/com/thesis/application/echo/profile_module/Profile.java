@@ -1,6 +1,7 @@
 package com.thesis.application.echo.profile_module;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -22,6 +24,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 import com.thesis.application.echo.R;
 import com.thesis.application.echo.main_home_module.MainHome;
 
@@ -29,14 +35,22 @@ import java.util.HashMap;
 
 public class Profile extends AppCompatActivity {
 
+    private static final int GALLERY_PICK = 1001 ;
+
     EditText edtTxtUsername, edtTxtFullname, edtTxtEmail, edtTxtPass, edtTxtConfirmPass;
     RadioGroup radioSexGroup;
     RadioButton radioBtnSex;
+    ImageView imageViewProfile;
+
 
     FirebaseAuth mAuth;
     FirebaseDatabase mFireBaseDatabase;
     FirebaseUser firebaseUser;
     DatabaseReference dbRef;
+    StorageReference profilePictRef;
+
+    Uri imageUri;
+    String downloadUrl;
 
     int selectedGender;
     String currentUserId;
@@ -51,6 +65,7 @@ public class Profile extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mFireBaseDatabase = FirebaseDatabase.getInstance();
         firebaseUser = mAuth.getCurrentUser();
+        profilePictRef = FirebaseStorage.getInstance().getReference();
 
         currentUserId = mAuth.getCurrentUser().getUid();
         currentUserEmail = mAuth.getCurrentUser().getEmail();
@@ -58,6 +73,7 @@ public class Profile extends AppCompatActivity {
 
         dbRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUserId);
 
+        imageViewProfile = findViewById(R.id.profilePictureEdit);
         edtTxtUsername = findViewById(R.id.edtTxtUsernameUpdateProfile);
         edtTxtFullname = findViewById(R.id.edtTxtFullnameUpdateProfile);
         radioSexGroup = findViewById(R.id.radioGroupGenderEdit);
@@ -71,15 +87,34 @@ public class Profile extends AppCompatActivity {
         btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateUser();
+                uploadPictureToFireBaseStorage();
             }
         });
+
+        /*imageViewProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openGallery();
+            }
+        });*/
+        loadUserInformation();
+    }
+
+    private void openGallery() {
+        Intent galleryIntent = new Intent();
+        galleryIntent.setType("image/*");
+        galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(galleryIntent, "Select Profile Image"), GALLERY_PICK);
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        loadUserInformation();
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == GALLERY_PICK && resultCode == RESULT_OK && data != null){
+            imageUri = data.getData();
+            imageViewProfile.setImageURI(imageUri);
+        }
     }
 
     private void goToMainMenu() {
@@ -87,6 +122,25 @@ public class Profile extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private void uploadPictureToFireBaseStorage(){
+        if(imageUri != null) {
+            StorageReference filePath = profilePictRef.child("ProfileImage").child(currentUserId + "_" + System.currentTimeMillis() + ".jpg");
+            filePath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        downloadUrl = task.getResult().getDownloadUrl().toString();
+                        updateUser();
+                        goToMainMenu();
+                        Toast.makeText(Profile.this, "Profile Successfully Updated", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(Profile.this, "Error Occurred: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
     }
 
     private void updateUser() {
@@ -104,14 +158,13 @@ public class Profile extends AppCompatActivity {
             userMapUpdate.put("username", username);
             userMapUpdate.put("fullname", fullname);
             userMapUpdate.put("gender", gender);
+            userMapUpdate.put("profilePictUrl", downloadUrl);
 
             dbRef.updateChildren(userMapUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
                         updateAuth(email, confirmPass);
-                        goToMainMenu();
-                        Toast.makeText(Profile.this, "Profile Successfully Updated", Toast.LENGTH_LONG).show();
 
                     } else {
                         Toast.makeText(Profile.this, "Error Occurred: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
@@ -182,7 +235,6 @@ public class Profile extends AppCompatActivity {
         return true;
     }
 
-
     private void loadUserInformation() {
         dbRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -190,9 +242,10 @@ public class Profile extends AppCompatActivity {
                 if(dataSnapshot.exists()) {
                     String username = dataSnapshot.child("username").getValue().toString();
                     String fullname = dataSnapshot.child("fullname").getValue().toString();
-
+                    String profilePict = dataSnapshot.child("profilePictUrl").getValue().toString();
                     String email = currentUserEmail;
 
+                    Picasso.get().load(profilePict).into(imageViewProfile);
                     edtTxtUsername.setText(username);
                     edtTxtFullname.setText(fullname);
                     edtTxtEmail.setText(email);

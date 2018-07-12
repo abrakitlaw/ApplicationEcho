@@ -66,5 +66,21 @@
     <string name="btn_edit_profile">Edit Profile</string>
     <string name="title_post">Post</string>
     <string name="select_a_image">Select a Image</string>
+    <string name="title_required">Title is required</string>
+    <string name="title_maximum_chars">Title length no more than 140 characters</string>
+    <string name="description_is_empty">Description is required</string>
+    <string name="description_minimum_chars">Description minimum characters is 6</string>
+    <string name="source_is_empty">Source is required</string>
+    <string name="source_minimum_chars">Source minimum characters is 10 characters</string>
+
+    <!--Post Category-->
+    <array name="spinnerCategory">
+        <item>Trending</item>
+        <item>Sport</item>
+        <item>Travel</item>
+        <item>Food</item>
+        <item>Health</item>
+        <item>Showbiz</item>
+    </array>
 
 </resources>
