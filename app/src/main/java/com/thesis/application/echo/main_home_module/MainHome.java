@@ -1,18 +1,23 @@
 package com.thesis.application.echo.main_home_module;
 
-import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -20,23 +25,32 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 import com.thesis.application.echo.R;
 
 import com.thesis.application.echo.login_module.Login;
 import com.thesis.application.echo.login_module.SaveUserInformation;
+import com.thesis.application.echo.models.Post;
+import com.thesis.application.echo.profile_module.Profile;
 import com.thesis.application.echo.profile_module.ProfileFragment;
-import com.thesis.application.echo.post_module.Post;
+import com.thesis.application.echo.post_module.PostActivity;
 
 
 public class MainHome extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final String TAG = MainHome.class.getName();
+
     FirebaseAuth mAuth;
-    DatabaseReference dbRef;
+    DatabaseReference dbRef, postRef;
     FirebaseDatabase mFireBaseDatabase;
     FirebaseUser firebaseUser;
+    private RecyclerView recyclerViewPostList;
 
+
+    String currentUserId;
     NavigationView navigationView;
+    DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,33 +59,99 @@ public class MainHome extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
         mFireBaseDatabase = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
         firebaseUser = mAuth.getCurrentUser();
 
-        dbRef = mFireBaseDatabase.getReference().child("users");
+        currentUserId = mAuth.getCurrentUser().getUid();
 
-        navigationView = findViewById(R.id.nav_view);
+        dbRef = mFireBaseDatabase.getReference().child("users");
+        postRef = mFireBaseDatabase.getReference().child("posts");
+
+
         //View navView = navigationView.inflateHeaderView(R.layout.nav_header_main_home);
 
-        navigationView.setNavigationItemSelectedListener(this);
+        recyclerViewPostList = findViewById(R.id.recyclerViewMainHome);
+        recyclerViewPostList.setHasFixedSize(true);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+        recyclerViewPostList.setLayoutManager(layoutManager);
+
+        displayAllUsersPost();
+
+    }
+
+
+    private void displayAllUsersPost() {
+        FirebaseRecyclerAdapter<Post, ViewHolderPost> fireBaseRecyclerAdapter =
+                new FirebaseRecyclerAdapter<Post, ViewHolderPost>(Post.class, R.layout.all_posts, ViewHolderPost.class, postRef) {
+            @Override
+            protected void populateViewHolder(ViewHolderPost viewHolder, Post model, int position) {
+                viewHolder.setPostTitle(model.getPostTitle());
+                viewHolder.setImageVideoUrl(model.getImageVideoUrl());
+                viewHolder.setPostDate(model.getPostDate());
+                viewHolder.setDescription(model.getDescription());
+                viewHolder.setTotalPoints(model.getTotalPoints());
+
+            }
+        };
+        recyclerViewPostList.setAdapter(fireBaseRecyclerAdapter);
+    }
+
+    public static class ViewHolderPost extends RecyclerView.ViewHolder {
+
+        View mView;
+
+        public ViewHolderPost(View itemView) {
+            super(itemView);
+            mView = itemView;
+        }
+
+        public void setPostTitle(String postTitle) {
+            TextView txtViewPostTitle = itemView.findViewById(R.id.titleOfPost);
+            txtViewPostTitle.setText(postTitle);
+        }
+
+        public void setImageVideoUrl(String imageVideoUrl) {
+            Uri imageUri = Uri.parse(imageVideoUrl);
+            ImageView imageViewImageVideoUrl = itemView.findViewById(R.id.imageViewPosted);
+            Picasso.get().load(imageUri).into(imageViewImageVideoUrl);
+        }
+
+        public void setPostDate(String postDate) {
+            TextView txtViewPostDate = itemView.findViewById(R.id.textViewDatePost);
+            txtViewPostDate.setText(postDate);
+        }
+
+        public void setDescription(String description) {
+            TextView txtViewPostDescription = itemView.findViewById(R.id.textViewPostDescription);
+            txtViewPostDescription.setText(description);
+        }
+
+        public void setTotalPoints(int totalPoints) {
+            String ttlPts = String.valueOf(totalPoints);
+            TextView txtViewTotalPoints = itemView.findViewById(R.id.textViewTotalPoints);
+            txtViewTotalPoints.setText(ttlPts);
+        }
     }
 
     private void goToProfile() {
-        Intent intent = new Intent(MainHome.this, ProfileFragment.class);
+        Intent intent = new Intent(MainHome.this, Profile.class);
         startActivity(intent);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
         FirebaseUser curUser = mAuth.getCurrentUser();
 
         if(curUser == null) {
@@ -79,6 +159,7 @@ public class MainHome extends AppCompatActivity
         }
         if(curUser != null) {
             checkUserExistence();
+            displayAllUsersPost();
         }
     }
 
@@ -146,7 +227,7 @@ public class MainHome extends AppCompatActivity
             return true;
         }
         if (id == R.id.btnPost) {
-            Intent intent = new Intent(MainHome.this, Post.class);
+            Intent intent = new Intent(MainHome.this, PostActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             return true;
@@ -168,14 +249,13 @@ public class MainHome extends AppCompatActivity
 
     private void displaySelectedScreen(int itemId) {
         android.support.v4.app.Fragment fragment = null;
-        Context context = this.getApplicationContext();
 
         switch (itemId) {
             case R.id.nav_profile:
-                fragment = new ProfileFragment();
+                goToProfile();
                 break;
             case R.id.nav_home:
-                    goToHome();
+                goToHome();
                 break;
             case R.id.nav_trending:
                 fragment = new TrendingFragment();
@@ -186,12 +266,11 @@ public class MainHome extends AppCompatActivity
 
         if(fragment != null) {
             android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.frameProfile, fragment);
+            fragmentTransaction.replace(R.id.content_frame, fragment);
             fragmentTransaction.commit();
         }
 
-        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
-        drawerLayout.closeDrawer(GravityCompat.START);
+        drawer.closeDrawer(GravityCompat.START);
     }
 
     private void goToHome() {

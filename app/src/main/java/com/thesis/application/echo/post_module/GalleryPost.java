@@ -43,6 +43,7 @@ import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -144,17 +145,19 @@ public class GalleryPost extends Fragment{
         randomName = saveCurrentDate + saveCurrentTime;
 
         progressBarPost.setVisibility(View.VISIBLE);
-        StorageReference filePath = storageReference.child("Post").child(imageUri.getLastPathSegment() + randomName + ".jpg");
+
+        StorageReference filePath = storageReference.child("PostActivity").child(imageUri.getLastPathSegment() + randomName + ".jpg");
+
         filePath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                 progressBarPost.setVisibility(View.GONE);
                 if(task.isSuccessful()) {
                     downloadUrl = task.getResult().getDownloadUrl().toString();
+                    postId = currentUserId + randomName;
 
-                    savingPostInformationToDatabase(title, description, category, source, downloadUrl, postDate, totalPoints, totalReport);
-                    Toast.makeText(getActivity().getApplicationContext(), "Successfully uploaded the post..", Toast.LENGTH_SHORT).show();
-                    goToHome();
+                    savingPostInformationToDatabase(postId, currentUserId, title, description, category, source, downloadUrl, postDate, totalPoints, totalReport);
+
                 } else {
                     Toast.makeText(getActivity().getApplicationContext(), "Error occurred: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -169,25 +172,32 @@ public class GalleryPost extends Fragment{
         getActivity().finish();
     }
 
-    private void savingPostInformationToDatabase(final String title, final String description, final String category, final String source, final String downloadUrl, final String postDate, final int totalPoints, final int totalReports) {
-        userRef.child(currentUserId).addValueEventListener(new ValueEventListener() {
+    private void savingPostInformationToDatabase(final String postId, final String userId, final String title, final String description, final String category, final String source, final String downloadUrl, final String postDate, final int totalPoints, final int totalReports) {
+
+        Map<String, Object> postMap = new HashMap<>();
+        postMap.put("postId", postId);
+        postMap.put("userId", userId);
+        postMap.put("description", description);
+        postMap.put("imageVideoUrl", downloadUrl);
+        postMap.put("postCategory", category);
+        postMap.put("postDate", postDate);
+        postMap.put("postSource", source);
+        postMap.put("postTitle", title);
+        postMap.put("totalPoints", totalPoints);
+        postMap.put("totalReports", totalReports);
+
+        postRef.child(postId).updateChildren(postMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    postId = currentUserId + randomName;
-
-                    HashMap<String, com.thesis.application.echo.models.Post> postsMap = new HashMap<>();
-                    postsMap.put(postId, new Post(title, description, category, source, downloadUrl, postDate, totalPoints, totalReports));
-
-                    postRef.child(currentUserId).setValue(postsMap);
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Successfully uploaded the post..", Toast.LENGTH_SHORT).show();
+                    goToHome();
+                } else {
+                    Toast.makeText(getActivity().getApplicationContext(), "Error occurred: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
         });
+
     }
 
     private boolean validationPostInfo(Uri imageUri, String title, String description, String source, String category) {

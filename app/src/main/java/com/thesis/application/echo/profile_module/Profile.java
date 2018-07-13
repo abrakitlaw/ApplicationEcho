@@ -1,18 +1,15 @@
 package com.thesis.application.echo.profile_module;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Patterns;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -33,98 +30,82 @@ import com.thesis.application.echo.main_home_module.MainHome;
 
 import java.util.HashMap;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class Profile extends AppCompatActivity {
 
-    private static final int GALLERY_PICK = 1001 ;
+    private static final int GALLERY_PICK = 1001;
 
-    EditText edtTxtUsername, edtTxtFullname, edtTxtEmail, edtTxtPass, edtTxtConfirmPass;
-    RadioGroup radioSexGroup;
-    RadioButton radioBtnSex;
-    ImageView imageViewProfile;
-
+    View view;
 
     FirebaseAuth mAuth;
-    FirebaseDatabase mFireBaseDatabase;
-    FirebaseUser firebaseUser;
     DatabaseReference dbRef;
+    FirebaseUser firebaseUser;
     StorageReference profilePictRef;
+
+    TextView txtUsername, txtEmail, txtFullName, txtGender;
+    CircleImageView profilePicture;
 
     Uri imageUri;
     String downloadUrl;
 
-    int selectedGender;
-    String currentUserId;
-    String currentUserEmail;
+    private String currentUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-        setTitle("Edit Profile");
+        setTitle("Profile");
 
-        mAuth = FirebaseAuth.getInstance();
-        mFireBaseDatabase = FirebaseDatabase.getInstance();
-        firebaseUser = mAuth.getCurrentUser();
         profilePictRef = FirebaseStorage.getInstance().getReference();
-
+        mAuth = FirebaseAuth.getInstance();
+        firebaseUser = mAuth.getCurrentUser();
         currentUserId = mAuth.getCurrentUser().getUid();
-        currentUserEmail = mAuth.getCurrentUser().getEmail();
 
+        dbRef = FirebaseDatabase.getInstance().getReference().child("users");
 
-        dbRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUserId);
+        profilePicture = findViewById(R.id.profilePicture);
+        txtUsername = findViewById(R.id.textViewUsernameProfile);
+        txtFullName = findViewById(R.id.textViewFullnameProfile);
+        txtGender = findViewById(R.id.textViewGenderProfile);
+        txtEmail = findViewById(R.id.textViewEmailProfile);
 
-        imageViewProfile = findViewById(R.id.profilePictureEdit);
-        edtTxtUsername = findViewById(R.id.edtTxtUsernameUpdateProfile);
-        edtTxtFullname = findViewById(R.id.edtTxtFullnameUpdateProfile);
-        radioSexGroup = findViewById(R.id.radioGroupGenderEdit);
-        selectedGender = radioSexGroup.getCheckedRadioButtonId();
-        radioBtnSex = findViewById(selectedGender);
-        edtTxtEmail = findViewById(R.id.edtTxtEmailUpdateProfile);
-        edtTxtPass = findViewById(R.id.edtTxtPasswordUpdateProfile);
-        edtTxtConfirmPass = findViewById(R.id.edtTxtConfirmPasswordUpdateProfile);
+        loadUserInformationProfile();
 
-        Button btnUpdate = findViewById(R.id.btnUpdateProfile);
+        Button btnUpdate = findViewById(R.id.btnEditProfile);
         btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateUser();
+
+                Intent intent = new Intent(getApplicationContext(), EditProfile.class);
+                startActivity(intent);
             }
         });
 
-        /*imageViewProfile.setOnClickListener(new View.OnClickListener() {
+        profilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openGallery();
             }
-        });*/
-        loadUserInformation();
+        });
     }
 
     private void openGallery() {
         Intent galleryIntent = new Intent();
         galleryIntent.setType("image/*");
         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(galleryIntent, "Select Profile Image"), GALLERY_PICK);
+        startActivityForResult(Intent.createChooser(galleryIntent, "Select EditProfile Image"), GALLERY_PICK);
     }
+
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == GALLERY_PICK && resultCode == RESULT_OK && data != null){
+        if(requestCode == GALLERY_PICK && resultCode == Activity.RESULT_OK && data != null ) {
             imageUri = data.getData();
-            imageViewProfile.setImageURI(imageUri);
+            profilePicture.setImageURI(imageUri);
         }
-    }
-
-    private void goToMainMenu() {
-        Intent intent = new Intent(getApplicationContext(), MainHome.class );
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
-    }
-
-    private void uploadPictureToFireBaseStorage(){
         if(imageUri != null) {
             StorageReference filePath = profilePictRef.child("ProfileImage").child(currentUserId + "_" + System.currentTimeMillis() + ".jpg");
             filePath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
@@ -132,129 +113,63 @@ public class Profile extends AppCompatActivity {
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                     if (task.isSuccessful()) {
                         downloadUrl = task.getResult().getDownloadUrl().toString();
-                        updateUser();
-                        goToMainMenu();
-                        Toast.makeText(Profile.this, "Profile Successfully Updated", Toast.LENGTH_LONG).show();
+                        updateUserProfilePicture();
                     } else {
-                        Toast.makeText(Profile.this, "Error Occurred: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Error Occurred: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 }
             });
         }
     }
 
-    private void updateUser() {
-        String username = edtTxtUsername.getText().toString().trim();
-        String fullname = edtTxtFullname.getText().toString().trim();
-        final String email = edtTxtEmail.getText().toString();
-        int selectedGender = radioSexGroup.getCheckedRadioButtonId();
-        radioBtnSex = findViewById(selectedGender);
-        String gender = radioBtnSex.getText().toString();
-        String password = edtTxtPass.getText().toString();
-        final String confirmPass = edtTxtConfirmPass.getText().toString();
+    private void updateUserProfilePicture() {
+        HashMap<String, Object> updateProfilePictUrlMap = new HashMap<>();
+        updateProfilePictUrlMap.put("profilePictUrl", downloadUrl);
 
-        if(updateValidation(username, fullname, email, password, confirmPass)) {
-            HashMap<String, Object> userMapUpdate = new HashMap<>();
-            userMapUpdate.put("username", username);
-            userMapUpdate.put("fullname", fullname);
-            userMapUpdate.put("gender", gender);
-
-            dbRef.updateChildren(userMapUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        updateAuth(email, confirmPass);
-                        Toast.makeText(Profile.this, "Profile Successfully Updated", Toast.LENGTH_LONG).show();
-                        goToMainMenu();
-                    } else {
-                        Toast.makeText(Profile.this, "Error Occurred: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
-
-        }
-
-    }
-
-    private void updateAuth(String currentEmail, String confirmPass) {
-        FirebaseUser firebaseUserUpdate =  mAuth.getCurrentUser();
-        firebaseUserUpdate.updateEmail(currentEmail).addOnCompleteListener(new OnCompleteListener<Void>() {
+        dbRef.child(currentUserId).updateChildren(updateProfilePictUrlMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()) {
-
+                if (task.isSuccessful()) {
+                    Toast.makeText(getApplicationContext(), "EditProfile Picture Updated", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getApplicationContext(), "Error occurred: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        firebaseUserUpdate.updatePassword(confirmPass).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()) {
-
-                } else {
-                    Toast.makeText(getApplicationContext(), "Error occurred: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Error Occurred: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         });
     }
 
-    private boolean updateValidation(String username, String fullname, String email, String password, String confirmPass) {
 
-        if(TextUtils.isEmpty(username)) {
-            edtTxtUsername.setError(getString(R.string.username_isEmpty));
-            edtTxtUsername.requestFocus();
-            return false;
-        }
-        if(TextUtils.isEmpty(fullname)) {
-            edtTxtFullname.setError(getString(R.string.full_name_is_empty));
-            edtTxtFullname.requestFocus();
-            return false;
-        }
-        if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            edtTxtEmail.setError(getString(R.string.email_invalid));
-            edtTxtEmail.requestFocus();
-            return false;
-        }
-        if(TextUtils.isEmpty(password)) {
-            edtTxtPass.setError(getString(R.string.password_isEmpty));
-            edtTxtPass.requestFocus();
-            return false;
-        }
-        if(TextUtils.isEmpty(confirmPass)) {
-            edtTxtConfirmPass.setError(getString(R.string.password_isEmpty));
-            edtTxtConfirmPass.requestFocus();
-            return false;
-        }
-        if(!password.equals(confirmPass)){
-            Toast.makeText(this, "Your Password doesn't match", Toast.LENGTH_LONG).show();
-            edtTxtConfirmPass.requestFocus();
-            return false;
-        }
-        return true;
-    }
-
-    private void loadUserInformation() {
-        dbRef.addValueEventListener(new ValueEventListener() {
+    private void loadUserInformationProfile() {
+        dbRef.child(currentUserId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()) {
+                    String profilePictUrl = dataSnapshot.child("profilePictUrl").getValue().toString();
                     String username = dataSnapshot.child("username").getValue().toString();
                     String fullname = dataSnapshot.child("fullname").getValue().toString();
-                    String profilePict = dataSnapshot.child("profilePictUrl").getValue().toString();
-                    String email = currentUserEmail;
+                    String gender = dataSnapshot.child("gender").getValue().toString();
+                    String email = mAuth.getCurrentUser().getEmail().trim();
 
-                    Picasso.get().load(profilePict).placeholder(R.drawable.ic_male_user_profile_picture).into(imageViewProfile);
-                    edtTxtUsername.setText(username);
-                    edtTxtFullname.setText(fullname);
-                    edtTxtEmail.setText(email);
-                    }
+                    Picasso.get().load(profilePictUrl).placeholder(R.drawable.ic_male_user_profile_picture).into(profilePicture);
+                    txtUsername.setText(username);
+                    txtFullName.setText(fullname);
+                    txtGender.setText(gender);
+                    txtEmail.setText(email);
                 }
+            }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(getApplicationContext(), MainHome.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 }

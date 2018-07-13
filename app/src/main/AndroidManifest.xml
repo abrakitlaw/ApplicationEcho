@@ -38,12 +38,13 @@
             android:theme="@style/Theme.Design.Light.NoActionBar" />
         <activity android:name=".login_module.ResetPassword" />
         <activity android:name=".login_module.ResetPasswordConfirmation" />
-        <activity android:name=".profile_module.Profile" />
+        <activity android:name=".profile_module.EditProfile" />
         <activity android:name=".login_module.SaveUserInformation" />
         <activity
-            android:name=".post_module.Post"
+            android:name=".post_module.PostActivity"
             android:label="@string/title_activity_post"
-            android:theme="@style/myMainTheme.NoActionBar"></activity>
+            android:theme="@style/Theme.Design.Light.NoActionBar" />
+        <activity android:name=".profile_module.Profile"></activity>
     </application>
 
 </manifest>

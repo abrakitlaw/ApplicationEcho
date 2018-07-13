@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.thesis.application.echo.post_module.Post">
+    tools:context="com.thesis.application.echo.post_module.PostActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbarPost"
@@ -15,13 +15,15 @@
         android:theme="@style/Base.Widget.AppCompat.Light.ActionBar.TabBar"
         android:backgroundTint="@color/colorPrimaryDark">
 
-        <Toolbar
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbarPost"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:title="@string/title_post"
+            app:titleTextColor="@color/white"
             android:background="@color/colorPrimary">
 
-        </Toolbar>
+        </android.support.v7.widget.Toolbar>
 
 
 

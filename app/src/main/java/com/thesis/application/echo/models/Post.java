@@ -32,7 +32,8 @@ public class Post {
         this.totalReports = totalReports;
     }
 
-    public Post(String postTitle, String description, String postCategory, String postSource, String imageVideoUrl, String postDate, int totalPoints, int totalReports) {
+    public Post(String userId, String postTitle, String description, String postCategory, String postSource, String imageVideoUrl, String postDate, int totalPoints, int totalReports) {
+        this.userId = userId;
         this.postTitle = postTitle;
         this.description = description;
         this.postCategory = postCategory;

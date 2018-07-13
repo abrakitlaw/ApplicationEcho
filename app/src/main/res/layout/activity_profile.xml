@@ -3,136 +3,82 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".main_home_module.MainHome"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.thesis.application.echo.profile_module.Profile">
+    android:layout_height="match_parent">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profilePictureEdit"
-        android:layout_width="160dp"
-        android:layout_height="160dp"
-        android:layout_marginTop="30dp"
+        android:id="@+id/profilePicture"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:layout_marginStart="27dp"
+        android:layout_marginTop="16dp"
         android:contentDescription="@string/profile_picture"
         android:scaleType="centerCrop"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:background="@android:color/transparent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:civ_border_width="1dp"
-        app:civ_border_color="#FF000000"
-        android:src="@drawable/ic_male_user_profile_picture"/>
+        android:src="@drawable/ic_male_user_profile_picture"
+        app:civ_border_width="3dp"
+        app:civ_border_color="#FF000000"/>
 
-    <EditText
-        android:id="@+id/edtTxtUsernameUpdateProfile"
+    <TextView
+        android:id="@+id/textViewUsernameProfile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:ems="13"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="25dp"
         android:hint="@string/hint_username"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="20sp"
         android:textStyle="bold"
-        android:textAllCaps="true"
-        android:textSize="16sp"
-        android:inputType="textPersonName"
-        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profilePictureEdit" />
+        app:layout_constraintStart_toEndOf="@+id/profilePicture"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/edtTxtFullnameUpdateProfile"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/textViewEmailProfile"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:ems="13"
-        android:hint="@string/hint_full_name"
-        android:inputType="textPersonName"
-        android:textAllCaps="true"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintHorizontal_bias="0.503"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtTxtUsernameUpdateProfile" />
-
-    <EditText
-        android:id="@+id/edtTxtEmailUpdateProfile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
         android:ems="13"
         android:hint="@string/hint_email"
-        android:inputType="textEmailAddress"
+        android:textAlignment="textStart"
         android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintHorizontal_bias="0.503"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtTxtFullnameUpdateProfile" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/profilePicture"
+        app:layout_constraintTop_toBottomOf="@+id/textViewUsernameProfile" />
 
-    <RadioGroup
-        android:id="@+id/radioGroupGenderEdit"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/textViewFullnameProfile"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:orientation="horizontal"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtTxtEmailUpdateProfile">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:text="@string/text_title_gender"
-            android:textSize="18sp" />
-        <RadioButton
-            android:id="@+id/radioBtnMale"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:text="@string/radio_male"
-            android:checked="true" />
-
-        <RadioButton
-            android:id="@+id/radioBtnFemale"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="30dp"
-            android:layout_marginEnd="10dp"
-            android:textSize="16sp"
-            android:text="@string/radio_female"/>
-
-    </RadioGroup>
-
-    <EditText
-        android:id="@+id/edtTxtPasswordUpdateProfile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
         android:ems="13"
-        android:hint="@string/hint_new_password"
-        android:inputType="textPassword"
+        android:hint="@string/hint_full_name"
+        android:textAlignment="textStart"
         android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintHorizontal_bias="0.503"
-        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radioGroupGenderEdit" />
+        app:layout_constraintStart_toEndOf="@+id/profilePicture"
+        app:layout_constraintTop_toBottomOf="@+id/textViewEmailProfile" />
 
-    <EditText
-        android:id="@+id/edtTxtConfirmPasswordUpdateProfile"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/textViewGenderProfile"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
         android:ems="13"
-        android:hint="@string/hint_confirm_new_password"
-        android:inputType="textPassword"
+        android:hint="@string/hind_gender"
+        android:textAlignment="textStart"
         android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintHorizontal_bias="0.503"
-        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtTxtPasswordUpdateProfile" />
+        app:layout_constraintStart_toEndOf="@+id/profilePicture"
+        app:layout_constraintTop_toBottomOf="@+id/textViewFullnameProfile" />
 
 
     <android.support.constraint.Guideline
@@ -140,18 +86,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.26" />
+        app:layout_constraintGuide_percent="0.3" />
 
     <Button
-        android:id="@+id/btnUpdateProfile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:backgroundTint="@color/replyOrange"
-        android:ems="10"
-        android:text="@string/btn_update"
+        android:id="@+id/btnEditProfile"
+        android:layout_width="130dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/btn_edit_profile"
         android:textAllCaps="false"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtTxtConfirmPasswordUpdateProfile" />
+        android:backgroundTint="@color/replyOrange"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profilePicture" />
 </android.support.constraint.ConstraintLayout>

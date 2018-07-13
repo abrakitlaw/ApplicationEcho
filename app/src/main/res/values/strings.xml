@@ -73,7 +73,7 @@
     <string name="source_is_empty">Source is required</string>
     <string name="source_minimum_chars">Source minimum characters is 10 characters</string>
 
-    <!--Post Category-->
+    PostActivityPost Category-->
     <array name="spinnerCategory">
         <item>Trending</item>
         <item>Sport</item>

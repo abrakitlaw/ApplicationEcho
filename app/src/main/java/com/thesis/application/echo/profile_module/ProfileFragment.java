@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,7 +27,6 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 import com.thesis.application.echo.R;
-import com.thesis.application.echo.profile_module.Profile;
 
 import java.util.HashMap;
 
@@ -40,14 +38,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends android.support.v4.app.Fragment {
 
-    public static final String USER_ID = "userId";
     private static final int GALLERY_PICK = 1001;
 
     View view;
 
     FirebaseAuth mAuth;
     DatabaseReference dbRef;
-    FirebaseDatabase mFireBaseDatabase;
     FirebaseUser firebaseUser;
     StorageReference profilePictRef;
 
@@ -84,7 +80,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(getActivity().getApplicationContext(), Profile.class);
+                Intent intent = new Intent(getActivity().getApplicationContext(), EditProfile.class);
                 getActivity().startActivity(intent);
             }
         });
@@ -103,8 +99,9 @@ public class ProfileFragment extends android.support.v4.app.Fragment {
         Intent galleryIntent = new Intent();
         galleryIntent.setType("image/*");
         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(galleryIntent, "Select Profile Image"), GALLERY_PICK);
+        startActivityForResult(Intent.createChooser(galleryIntent, "Select EditProfile Image"), GALLERY_PICK);
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -138,7 +135,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(getActivity().getApplicationContext(), "Profile Picture Updated", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity().getApplicationContext(), "EditProfile Picture Updated", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getActivity().getApplicationContext(), "Error Occurred: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                 }
@@ -178,7 +175,7 @@ public class ProfileFragment extends android.support.v4.app.Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getActivity().setTitle("Profile");
+        getActivity().setTitle("EditProfile");
 
     }
 

@@ -23,8 +23,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -50,14 +53,11 @@ public class SaveUserInformation extends AppCompatActivity {
 
     private StorageReference userProfileImageRef;
 
-    private ProgressDialog progressDialog;
-
     private Uri imageUri;
-    private String downloadUrl;
+    private String downloadUrl, fullname, username, gender;
 
     String currentUserId;
     private static final int GALLERY_PICK = 1001;
-    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +72,6 @@ public class SaveUserInformation extends AppCompatActivity {
 
         dbRef = FirebaseDatabase.getInstance().getReference().child("users");
 
-        progressDialog = new ProgressDialog(this);
         editTextFullName = findViewById(R.id.editTextFullNameSaveUserInformation);
         editTextUsername = findViewById(R.id.editTextUsernameSaveUserInformation);
         radioGender = findViewById(R.id.radioGroupGenderSaveUserInformation);
@@ -91,7 +90,7 @@ public class SaveUserInformation extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                uploadImageToStorage();
+                saveUserRegistrationInformation();
             }
         });
     }
@@ -100,7 +99,7 @@ public class SaveUserInformation extends AppCompatActivity {
         Intent galleryIntent = new Intent();
         galleryIntent.setType("image/*");
         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(galleryIntent, "Select Profile Image"), GALLERY_PICK);
+        startActivityForResult(Intent.createChooser(galleryIntent, "Select EditProfile Image"), GALLERY_PICK);
     }
 
     @Override
@@ -114,57 +113,42 @@ public class SaveUserInformation extends AppCompatActivity {
         }
     }
 
-    private void uploadImageToStorage() {
-        if(imageUri != null) {
-            StorageReference filePath = userProfileImageRef.child("ProfileImage").child(imageUri.getLastPathSegment() + "_" + username + "_" + System.currentTimeMillis() + ".jpg");
-            filePath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        downloadUrl = task.getResult().getDownloadUrl().toString();
-                        saveUserInfo(downloadUrl);
-                        goToMainHome();
-                        progressDialog.dismiss();
-                    } else {
-                        progressDialog.dismiss();
-                        Toast.makeText(SaveUserInformation.this, "Error occurred: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-        } else {
-            Toast.makeText(SaveUserInformation.this, "Please select your profile picture", Toast.LENGTH_SHORT).show();
-        }
-
-    }
-
-    private void saveUserInfo(String downloadUrl) {
-        String fullname = editTextFullName.getText().toString();
+    private void saveUserRegistrationInformation() {
+        fullname = editTextFullName.getText().toString();
         username = editTextUsername.getText().toString();
-
         int selectedGender = radioGender.getCheckedRadioButtonId();
         radioButton = findViewById(selectedGender);
-        String gender = radioButton.getText().toString();
+        gender = radioButton.getText().toString();
 
-        if(validationInput(fullname, username, gender)) {
-            progressDialog.setTitle("Saving Information");
-            progressDialog.setMessage("Please wait, while we are creating your new account..");
-            progressDialog.show();
-            progressDialog.setCanceledOnTouchOutside(true);
-
-            HashMap<String, User> userMap = new HashMap<>();
-            userMap.put(currentUserId, new User(username, fullname, gender, downloadUrl));
-            dbRef.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if(task.isSuccessful()) {
-                        Toast.makeText(SaveUserInformation.this, "Your Account Successfully Registered", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(SaveUserInformation.this,  "Error occurred: " + task.getException().getMessage(),Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
+        if(validationInput(imageUri, fullname, username, gender)) {
+            uploadImageToStorage();
         }
+    }
 
+
+    private void uploadImageToStorage() {
+        StorageReference filePath = userProfileImageRef.child("ProfileImage").child(imageUri.getLastPathSegment() + "_" + username + "_" + System.currentTimeMillis() + ".jpg");
+        filePath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                if (task.isSuccessful()) {
+                    downloadUrl = task.getResult().getDownloadUrl().toString();
+                    saveUserInfo();
+                    goToMainHome();
+                } else {
+                    Toast.makeText(SaveUserInformation.this, "Error occurred: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void saveUserInfo() {
+        dbRef.child(currentUserId).setValue(new User(username, fullname, gender, downloadUrl)).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(SaveUserInformation.this, "User information successfully saved", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void goToMainHome() {
@@ -173,7 +157,7 @@ public class SaveUserInformation extends AppCompatActivity {
         finish();
     }
 
-    private boolean validationInput(String fullname, String username, String gender) {
+    private boolean validationInput(Uri imageUri, String fullname, String username, String gender) {
         if(TextUtils.isEmpty(fullname)) {
             editTextFullName.setError(getString(R.string.full_name_is_empty));
             editTextFullName.requestFocus();
@@ -182,8 +166,14 @@ public class SaveUserInformation extends AppCompatActivity {
             editTextUsername.setError(getString(R.string.username_isEmpty));
             editTextUsername.requestFocus();
             return false;
-        } else {
-            return true;
+        } else if(imageUri == null) {
+            Toast.makeText(SaveUserInformation.this, "Please select your profile picture", Toast.LENGTH_LONG).show();
+            return false;
+        } else if(TextUtils.isEmpty(gender)) {
+            radioButton.setError("Please select your gender");
+            radioButton.requestFocus();
+            return false;
         }
+        return true;
     }
 }

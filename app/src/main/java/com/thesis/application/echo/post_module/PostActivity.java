@@ -21,7 +21,7 @@ import android.widget.TextView;
 import com.thesis.application.echo.R;
 import com.thesis.application.echo.main_home_module.MainHome;
 
-public class Post extends AppCompatActivity {
+public class PostActivity extends AppCompatActivity {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -43,7 +43,7 @@ public class Post extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbarPost);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -77,7 +77,7 @@ public class Post extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_cancel) {
-            Intent intent = new Intent(Post.this, MainHome.class);
+            Intent intent = new Intent(PostActivity.this, MainHome.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             return true;
