@@ -13,13 +13,17 @@ public class Post {
     public String postSource;
     public String imageVideoUrl;
     public String postDate;
+    public int totalLikes;
+    public int totalDislikes;
     public int totalPoints;
     public int totalReports;
 
     public Post() {
     }
 
-    public Post(String postId, String userId, String postTitle, String description, String postCategory, String postSource, String imageVideoUrl, String postDate, int totalPoints, int totalReports) {
+    public Post(String postId, String userId, String postTitle, String description,
+                String postCategory, String postSource, String imageVideoUrl, String postDate,
+                int totalLikes, int totalDislikes, int totalPoints, int totalReports) {
         this.postId = postId;
         this.userId = userId;
         this.postTitle = postTitle;
@@ -28,11 +32,14 @@ public class Post {
         this.postSource = postSource;
         this.imageVideoUrl = imageVideoUrl;
         this.postDate = postDate;
+        this.totalLikes = totalLikes;
+        this.totalDislikes = totalDislikes;
         this.totalPoints = totalPoints;
         this.totalReports = totalReports;
     }
 
-    public Post(String userId, String postTitle, String description, String postCategory, String postSource, String imageVideoUrl, String postDate, int totalPoints, int totalReports) {
+    public Post(String userId, String postTitle, String description, String postCategory,
+                String postSource, String imageVideoUrl, String postDate, int totalPoints, int totalReports) {
         this.userId = userId;
         this.postTitle = postTitle;
         this.description = description;
@@ -106,6 +113,22 @@ public class Post {
 
     public void setPostDate(String postDate) {
         this.postDate = postDate;
+    }
+
+    public int getTotalLikes() {
+        return totalLikes;
+    }
+
+    public void setTotalLikes(int totalLikes) {
+        this.totalLikes = totalLikes;
+    }
+
+    public int getTotalDislikes() {
+        return totalDislikes;
+    }
+
+    public void setTotalDislikes(int totalDislikes) {
+        this.totalDislikes = totalDislikes;
     }
 
     public int getTotalPoints() {

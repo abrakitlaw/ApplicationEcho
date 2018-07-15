@@ -10,9 +10,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -46,10 +49,12 @@ public class SaveUserInformation extends AppCompatActivity {
     private RadioGroup radioGender;
     private RadioButton radioButton;
     private CircleImageView profilePicture;
+    private ProgressBar progressBarSaveUser;
 
     private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
     private DatabaseReference dbRef;
+    private LinearLayout grayBackground;
 
     private StorageReference userProfileImageRef;
 
@@ -72,6 +77,8 @@ public class SaveUserInformation extends AppCompatActivity {
 
         dbRef = FirebaseDatabase.getInstance().getReference().child("users");
 
+        progressBarSaveUser = findViewById(R.id.progressBarSaveUserInformation);
+        grayBackground = findViewById(R.id.linearLayoutGrayBackgroundSaveUserInformation);
         editTextFullName = findViewById(R.id.editTextFullNameSaveUserInformation);
         editTextUsername = findViewById(R.id.editTextUsernameSaveUserInformation);
         radioGender = findViewById(R.id.radioGroupGenderSaveUserInformation);
@@ -127,6 +134,10 @@ public class SaveUserInformation extends AppCompatActivity {
 
 
     private void uploadImageToStorage() {
+        progressBarSaveUser.setVisibility(View.VISIBLE);
+        grayBackground.setVisibility(View.VISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
         StorageReference filePath = userProfileImageRef.child("ProfileImage").child(imageUri.getLastPathSegment() + "_" + username + "_" + System.currentTimeMillis() + ".jpg");
         filePath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -143,6 +154,10 @@ public class SaveUserInformation extends AppCompatActivity {
     }
 
     private void saveUserInfo() {
+        progressBarSaveUser.setVisibility(View.GONE);
+        grayBackground.setVisibility(View.VISIBLE);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
         dbRef.child(currentUserId).setValue(new User(username, fullname, gender, downloadUrl)).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -175,5 +190,14 @@ public class SaveUserInformation extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(progressBarSaveUser.getVisibility() == View.VISIBLE) {
+            progressBarSaveUser.setVisibility(View.GONE);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        }
     }
 }

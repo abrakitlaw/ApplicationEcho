@@ -30,14 +30,14 @@
                 android:textStyle="bold"/>
 
             <ImageButton
-                android:id="@+id/imageButtonOption"
+                android:id="@+id/imageButtonFlagReport"
                 android:layout_width="17dp"
                 android:layout_height="38dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="2dp"
                 android:scaleType="center"
                 android:background="@android:color/transparent"
-                android:src="@drawable/ic_flag_black_24dp"/>
+                android:src="@drawable/ic_flag_white_24dp"/>
         </LinearLayout>
 
         <ImageView
@@ -67,7 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="6dp"
                 android:textColor="@android:color/darker_gray"
                 android:textStyle="bold"
                 android:textSize="13sp"
@@ -77,10 +77,34 @@
                 android:id="@+id/textViewDatePost"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="6dp"
                 android:layout_marginStart="5dp"
                 android:textColor="@android:color/black"
                 android:text="Date"
+                android:textStyle="bold"
+                android:textSize="13sp"/>
+
+            <TextView
+                android:id="@+id/textViewTotalPoints"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginStart="0dp"
+                android:textColor="@android:color/black"
+                android:text="100"
+                android:visibility="gone"
+                android:textStyle="bold"
+                android:textSize="13sp"/>
+
+            <TextView
+                android:id="@+id/textViewTotalLikes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginStart="60dp"
+                android:textColor="@android:color/black"
+                android:text="100"
+                android:textStyle="bold"
                 android:textSize="13sp"/>
 
             <ImageButton
@@ -90,20 +114,20 @@
                 android:scaleType="center"
                 android:contentDescription="thumb up"
                 android:layout_gravity="center|end"
-                android:layout_marginStart="100dp"
+                android:layout_marginStart="5dp"
                 android:layout_marginTop="2dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_thumb_up_white_24dp"/>
 
             <TextView
-                android:id="@+id/textViewTotalPoints"
+                android:id="@+id/textViewTotalDislikes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginStart="10dp"
                 android:textColor="@android:color/black"
-                android:text="Total points"
+                android:text="100"
+                android:textStyle="bold"
                 android:textSize="13sp"/>
 
             <ImageButton
@@ -114,6 +138,7 @@
                 android:contentDescription="thumb down"
                 android:layout_gravity="center|end"
                 android:layout_marginTop="2dp"
+                android:layout_marginStart="5dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_thumb_down_white_24dp"/>
 
@@ -149,6 +174,7 @@
             android:layout_marginStart="5dp"
             android:textColor="@android:color/black"
             android:textSize="12sp"
+            android:textStyle="bold"
             android:text="Description of your post will be showed below here"/>
 
     </LinearLayout>

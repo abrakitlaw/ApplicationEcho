@@ -7,6 +7,11 @@
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
 
+    <color name="color_primary">#EE0202</color>
+    <color name="color_complementary">#02EEEE</color>
+    <color name="analogous_1">#EE0278</color>
+    <color name="analogous_2">#ee7802</color>
+
     <!--Button Color-->
     <color name="buttonSignUp">#59ABE3</color>
     <color name="buttonLogin">#2ECC71</color>

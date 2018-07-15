@@ -13,10 +13,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -144,14 +146,14 @@ public class GalleryPost extends Fragment{
         postId = currentUserId + randomName;
         randomName = saveCurrentDate + saveCurrentTime;
 
-        progressBarPost.setVisibility(View.VISIBLE);
-
         StorageReference filePath = storageReference.child("PostActivity").child(imageUri.getLastPathSegment() + randomName + ".jpg");
+
+        progressBarPost.setVisibility(View.VISIBLE);
+        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
         filePath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                progressBarPost.setVisibility(View.GONE);
                 if(task.isSuccessful()) {
                     downloadUrl = task.getResult().getDownloadUrl().toString();
                     postId = currentUserId + randomName;
@@ -189,6 +191,8 @@ public class GalleryPost extends Fragment{
         postRef.child(postId).updateChildren(postMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
+                progressBarPost.setVisibility(View.GONE);
+                getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                 if(task.isSuccessful()) {
                     Toast.makeText(getActivity().getApplicationContext(), "Successfully uploaded the post..", Toast.LENGTH_SHORT).show();
                     goToHome();

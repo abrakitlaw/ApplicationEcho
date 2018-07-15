@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.thesis.application.echo.post_module.ContentActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="3dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp"
+            android:id="@+id/linearLayout">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:padding="5dp"
+                android:orientation="horizontal">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profileImageContent"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:contentDescription="profilePicture"
+                    android:src="@drawable/ic_male_user_profile_picture"
+                    android:background="@android:color/transparent"/>
+
+                <TextView
+                    android:id="@+id/textViewUsernameContent"
+                    android:layout_width="245dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="20dp"
+                    android:maxWidth="100dp"
+                    android:text="Username"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageButton
+                        android:id="@+id/imageButtonOptionContent"
+                        android:layout_width="17dp"
+                        android:layout_height="38dp"
+                        android:layout_marginStart="30dp"
+                        android:layout_marginTop="2dp"
+                        android:scaleType="center"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/ic_flag_white_24dp"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+            </LinearLayout>
+            <TextView
+                android:id="@+id/titlePostContent"
+                android:layout_width="345dp"
+                android:layout_height="wrap_content"
+                android:maxWidth="345dp"
+                android:textColor="@android:color/black"
+                android:text="Title of the post"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/textViewCategoryContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
+                android:text="Category"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
+
+            <ImageView
+                android:id="@+id/imageViewPostedContent"
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                android:scaleType="fitCenter"
+                android:background="@color/colorAccent"
+                android:visibility="visible"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ic_male_user_profile_picture"/>
+
+            <VideoView
+                android:id="@+id/videoViewPosted"
+                android:layout_width="match_parent"
+                android:layout_height="210dp"
+                android:scaleType="centerInside"
+                android:background="@color/colorAccent"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@android:color/darker_gray"
+                    android:textStyle="bold"
+                    android:textSize="13sp"
+                    android:text="Posted at" />
+
+                <TextView
+                    android:id="@+id/textViewDatePostContent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginStart="5dp"
+                    android:textColor="@android:color/black"
+                    android:text="Date"
+                    android:textStyle="bold"
+                    android:textSize="13sp"/>
+
+                <ImageButton
+                    android:id="@+id/imageButtonThumbUpContent"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:scaleType="center"
+                    android:contentDescription="thumb up"
+                    android:layout_gravity="center|end"
+                    android:layout_marginStart="100dp"
+                    android:layout_marginTop="2dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_thumb_up_white_24dp"/>
+
+                <TextView
+                    android:id="@+id/textViewTotalPointsContent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:textColor="@android:color/black"
+                    android:text="Total points"
+                    android:textStyle="bold"
+                    android:textSize="13sp"/>
+
+                <ImageButton
+                    android:id="@+id/imageButtonThumbDownContent"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:scaleType="center"
+                    android:contentDescription="thumb down"
+                    android:layout_gravity="center|end"
+                    android:layout_marginTop="2dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_thumb_down_white_24dp"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@android:color/darker_gray"
+                    android:textStyle="bold"
+                    android:textSize="13sp"
+                    android:text="Source" />
+
+                <TextView
+                    android:id="@+id/textViewSourcePostContent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginStart="5dp"
+                    android:textColor="@android:color/black"
+                    android:text="Source post will be showed here"
+                    android:textStyle="bold"
+                    android:textSize="13sp"/>
+            </LinearLayout>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginStart="5dp"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="13sp"
+                android:text="Description"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/textViewPostDescriptionContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:layout_marginStart="5dp"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:text="Description of your post will be showed below here"/>
+
+
+            <Button
+                android:id="@+id/btnEditContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="67dp"
+                android:background="@color/buttonSignUp"
+                android:ems="7"
+                android:text="Edit"
+                android:layout_gravity="center"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btnDeleteContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
+                android:background="@android:color/holo_red_light"
+                android:ems="7"
+                android:text="Delete"
+                android:layout_gravity="center"
+                android:textAllCaps="false" />
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

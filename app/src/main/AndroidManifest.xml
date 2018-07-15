@@ -44,7 +44,10 @@
             android:name=".post_module.PostActivity"
             android:label="@string/title_activity_post"
             android:theme="@style/Theme.Design.Light.NoActionBar" />
-        <activity android:name=".profile_module.Profile"></activity>
+        <activity android:name=".profile_module.Profile" />
+        <activity android:name=".post_module.ContentActivity" />
+        <activity android:name=".post_module.EditContent" />
+        <activity android:name=".post_module.CommentActivity"></activity>
     </application>
 
 </manifest>

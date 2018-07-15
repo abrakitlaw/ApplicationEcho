@@ -10,6 +10,14 @@
     android:focusableInTouchMode="true"
     tools:context="com.thesis.application.echo.login_module.RegisterUser">
 
+    <LinearLayout
+        android:id="@+id/linearLayoutGrayBackgroundRegister"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:background="@android:color/darker_gray"
+        android:visibility="gone" />
+
     <ProgressBar
         android:id="@+id/progressBarRegister"
         style="?android:attr/progressBarStyle"
@@ -71,6 +79,18 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/editTextEmailSignUp" />
 
+        <EditText
+            android:id="@+id/editTextConfirmPasswordSignUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ems="13"
+            android:hint="@string/hint_confirm_password"
+            android:inputType="textPassword"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editTextPasswordSignUp" />
+
         <Button
             android:id="@+id/btnRegister"
             android:layout_width="wrap_content"
@@ -83,7 +103,7 @@
             android:textColor="@color/white"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextPasswordSignUp" />
+            app:layout_constraintTop_toBottomOf="@+id/editTextConfirmPasswordSignUp" />
 
     </android.support.constraint.ConstraintLayout>
 </android.support.constraint.ConstraintLayout>

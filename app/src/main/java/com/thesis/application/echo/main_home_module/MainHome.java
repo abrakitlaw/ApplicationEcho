@@ -1,12 +1,16 @@
 package com.thesis.application.echo.main_home_module;
 
+import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -31,10 +36,10 @@ import com.thesis.application.echo.R;
 import com.thesis.application.echo.login_module.Login;
 import com.thesis.application.echo.login_module.SaveUserInformation;
 import com.thesis.application.echo.models.Post;
+import com.thesis.application.echo.post_module.CommentActivity;
+import com.thesis.application.echo.post_module.ContentActivity;
 import com.thesis.application.echo.profile_module.Profile;
-import com.thesis.application.echo.profile_module.ProfileFragment;
 import com.thesis.application.echo.post_module.PostActivity;
-
 
 public class MainHome extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -42,12 +47,14 @@ public class MainHome extends AppCompatActivity
     private static final String TAG = MainHome.class.getName();
 
     FirebaseAuth mAuth;
-    DatabaseReference dbRef, postRef;
+    DatabaseReference dbRef, postRef, likeRef, dislikeRef, flagRef;
     FirebaseDatabase mFireBaseDatabase;
     FirebaseUser firebaseUser;
     private RecyclerView recyclerViewPostList;
 
-
+    Boolean flagChecker;
+    Boolean likeChecker;
+    Boolean dislikeChecker;
     String currentUserId;
     NavigationView navigationView;
     DrawerLayout drawer;
@@ -76,7 +83,9 @@ public class MainHome extends AppCompatActivity
 
         dbRef = mFireBaseDatabase.getReference().child("users");
         postRef = mFireBaseDatabase.getReference().child("posts");
-
+        likeRef = mFireBaseDatabase.getReference().child("likes");
+        dislikeRef = mFireBaseDatabase.getReference().child("dislikes");
+        flagRef = mFireBaseDatabase.getReference().child("reports");
 
         //View navView = navigationView.inflateHeaderView(R.layout.nav_header_main_home);
 
@@ -90,18 +99,160 @@ public class MainHome extends AppCompatActivity
 
     }
 
-
     private void displayAllUsersPost() {
         FirebaseRecyclerAdapter<Post, ViewHolderPost> fireBaseRecyclerAdapter =
                 new FirebaseRecyclerAdapter<Post, ViewHolderPost>(Post.class, R.layout.all_posts, ViewHolderPost.class, postRef) {
             @Override
             protected void populateViewHolder(ViewHolderPost viewHolder, Post model, int position) {
+
+                final String postKey = getRef(position).getKey();
+
                 viewHolder.setPostTitle(model.getPostTitle());
                 viewHolder.setImageVideoUrl(model.getImageVideoUrl());
                 viewHolder.setPostDate(model.getPostDate());
                 viewHolder.setDescription(model.getDescription());
                 viewHolder.setTotalPoints(model.getTotalPoints());
 
+                viewHolder.setLikeButtonStatus(postKey);
+                viewHolder.setDislikeButtonStatus(postKey);
+                viewHolder.setFlagStatus(postKey);
+
+
+                viewHolder.btnFlagReport.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        flagChecker = true;
+
+                        flagRef.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (flagChecker.equals(true)) {
+                                    if (dataSnapshot.child(postKey).hasChild(currentUserId)) {
+                                        flagRef.child(postKey).child(currentUserId).removeValue();
+                                        flagChecker = false;
+                                    } else {
+                                        flagRef.child(postKey).child(currentUserId).setValue(true);
+                                        flagChecker = false;
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+
+                    }
+                });
+
+                viewHolder.textViewPostTitle.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(MainHome.this, ContentActivity.class);
+                        intent.putExtra("postKey", postKey);
+                        startActivity(intent);
+                    }
+                });
+
+                viewHolder.btnComment.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(MainHome.this, CommentActivity.class);
+                        intent.putExtra("postKey", postKey);
+                        startActivity(intent);
+                    }
+                });
+
+                viewHolder.btnThumbUp.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        likeChecker = true;
+                        dislikeChecker = true;
+
+                        likeRef.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (likeChecker.equals(true)) {
+                                    if (dataSnapshot.child(postKey).hasChild(currentUserId)) {
+                                        likeRef.child(postKey).child(currentUserId).removeValue();
+                                        likeChecker = false;
+                                    } else {
+                                        likeRef.child(postKey).child(currentUserId).setValue(true);
+
+                                        dislikeRef.addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                if (dislikeChecker.equals(true)) {
+                                                    if (dataSnapshot.child(postKey).hasChild(currentUserId)) {
+                                                        dislikeRef.child(postKey).child(currentUserId).removeValue();
+                                                        dislikeChecker = false;
+                                                    }
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
+
+                                            }
+                                        });
+                                        likeChecker = false;
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                });
+
+                viewHolder.btnThumbDown.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dislikeChecker = true;
+                        likeChecker = true;
+
+                        dislikeRef.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (dislikeChecker.equals(true)) {
+                                    if (dataSnapshot.child(postKey).hasChild(currentUserId)) {
+                                        dislikeRef.child(postKey).child(currentUserId).removeValue();
+                                        dislikeChecker = false;
+                                    } else {
+                                        dislikeRef.child(postKey).child(currentUserId).setValue(true);
+
+                                        likeRef.addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                if (likeChecker.equals(true)) {
+                                                    if (dataSnapshot.child(postKey).hasChild(currentUserId)) {
+                                                        likeRef.child(postKey).child(currentUserId).removeValue();
+                                                        likeChecker = false;
+                                                    }
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
+
+                                            }
+                                        });
+                                        dislikeChecker = false;
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                });
             }
         };
         recyclerViewPostList.setAdapter(fireBaseRecyclerAdapter);
@@ -110,10 +261,29 @@ public class MainHome extends AppCompatActivity
     public static class ViewHolderPost extends RecyclerView.ViewHolder {
 
         View mView;
+        ImageButton btnThumbUp, btnThumbDown, btnComment, btnFlagReport;
+        TextView textViewTotalPoints, textViewPostTitle, viewTotalLikes, viewTotalDislikes;
+        int countLikes, countDislikes, countReports;
+        String currentUserId;
+        DatabaseReference likeRef, dislikeRef, flagRef;
 
         public ViewHolderPost(View itemView) {
             super(itemView);
             mView = itemView;
+
+            btnFlagReport = mView.findViewById(R.id.imageButtonFlagReport);
+            viewTotalLikes = mView.findViewById(R.id.textViewTotalLikes);
+            viewTotalDislikes = mView.findViewById(R.id.textViewTotalDislikes);
+            textViewPostTitle = mView.findViewById(R.id.titleOfPost);
+            textViewTotalPoints = mView.findViewById(R.id.textViewTotalPoints);
+            btnThumbDown = mView.findViewById(R.id.imageButtonThumbDown);
+            btnThumbUp = mView.findViewById(R.id.imageButtonThumbUp);
+            btnComment = mView.findViewById(R.id.imageButtonComment);
+
+            flagRef = FirebaseDatabase.getInstance().getReference().child("reports");
+            likeRef = FirebaseDatabase.getInstance().getReference().child("likes");
+            dislikeRef = FirebaseDatabase.getInstance().getReference().child("dislikes");
+            currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         }
 
         public void setPostTitle(String postTitle) {
@@ -141,6 +311,80 @@ public class MainHome extends AppCompatActivity
             String ttlPts = String.valueOf(totalPoints);
             TextView txtViewTotalPoints = itemView.findViewById(R.id.textViewTotalPoints);
             txtViewTotalPoints.setText(ttlPts);
+        }
+
+        public void setFlagStatus(final String postKey) {
+            flagRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.child(postKey).hasChild(currentUserId)) {
+                        countReports = (int) dataSnapshot.child(postKey).getChildrenCount();
+                        btnFlagReport.setImageResource(R.drawable.ic_flag_black_24dp);
+                    } else {
+                        countReports = (int) dataSnapshot.child(postKey).getChildrenCount();
+                        btnFlagReport.setImageResource(R.drawable.ic_flag_white_24dp);
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+        public void setLikeButtonStatus(final String postKey) {
+            likeRef.addValueEventListener(new ValueEventListener() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.child(postKey).hasChild(currentUserId)) {
+                        countLikes = (int) dataSnapshot.child(postKey).getChildrenCount();
+                        btnThumbUp.setImageResource(R.drawable.ic_thumb_up_green_24dp);
+                        btnThumbDown.setImageResource(R.drawable.ic_thumb_down_white_24dp);
+                        viewTotalLikes.setText(Integer.toString(countLikes));
+
+                    } else {
+                        countLikes = (int) dataSnapshot.child(postKey).getChildrenCount();
+                        btnThumbUp.setImageResource(R.drawable.ic_thumb_up_white_24dp);
+                        viewTotalLikes.setText(Integer.toString(countLikes));
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+        @SuppressLint("SetTextI18n")
+        public void setDislikeButtonStatus(final String postKey) {
+            dislikeRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.child(postKey).hasChild(currentUserId)) {
+                        countDislikes = (int) dataSnapshot.child(postKey).getChildrenCount();
+                        btnThumbDown.setImageResource(R.drawable.ic_thumb_down_red_24dp);
+                        btnThumbUp.setImageResource(R.drawable.ic_thumb_up_white_24dp);
+                        viewTotalDislikes.setText(Integer.toString(countDislikes));
+
+                    } else {
+                        countDislikes = (int) dataSnapshot.child(postKey).getChildrenCount();
+                        btnThumbDown.setImageResource(R.drawable.ic_thumb_down_white_24dp);
+                        viewTotalDislikes.setText(Integer.toString(countDislikes));
+
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
         }
     }
 

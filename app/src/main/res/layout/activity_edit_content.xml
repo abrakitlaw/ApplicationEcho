@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent"
+    tools:context="com.thesis.application.echo.post_module.EditContent">
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -13,32 +16,21 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <ImageButton
-                android:id="@+id/btnImageSelect"
-                android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:contentDescription="@string/select_a_image"
-                android:cropToPadding="true"
-                android:orientation="vertical"
-                android:padding="10dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_image_black_24dp"/>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
                 <TextView
-                    android:id="@+id/titlePost"
+                    android:id="@+id/titlePostEditContent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:text="Title"
-                    android:textColor="@color/black"
+                    android:textColor="@android:color/darker_gray"
                     android:textStyle="bold"/>
 
                 <EditText
-                    android:id="@+id/editTextTitlePost"
+                    android:id="@+id/editTextTitlePostEditContent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
@@ -57,7 +49,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
                 android:text="Write your story"
-                android:textColor="@color/black"
+                android:textColor="@android:color/darker_gray"
                 android:textStyle="bold"/>
 
             <ScrollView
@@ -69,7 +61,7 @@
                 android:layout_marginTop="5dp">
 
                 <EditText
-                    android:id="@+id/editTextShareYourStory"
+                    android:id="@+id/editTextShareYourStoryEditContent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Write a story"
@@ -91,11 +83,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:text="Source"
-                    android:textColor="@color/black"
+                    android:textColor="@android:color/darker_gray"
                     android:textStyle="bold"/>
 
                 <EditText
-                    android:id="@+id/editTextSourceGalleryPost"
+                    android:id="@+id/editTextSourceGalleryPostEditContent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
@@ -116,11 +108,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:text="Category"
-                    android:textColor="@color/black"
+                    android:textColor="@android:color/darker_gray"
                     android:textStyle="bold" />
 
                 <Spinner
-                    android:id="@+id/spinnerCategoryPost"
+                    android:id="@+id/spinnerCategoryPostEditContent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="4dp"
@@ -131,7 +123,7 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/btnPostGallery"
+                android:id="@+id/btnEditContentGallery"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
@@ -139,7 +131,7 @@
                 android:layout_gravity="center"
                 android:background="@color/replyOrange"
                 android:ems="7"
-                android:text="Post"
+                android:text="Edit"
                 android:textAllCaps="false"
                 android:textColor="@color/black"
                 android:textSize="14sp"/>
@@ -147,13 +139,14 @@
         </LinearLayout>
     </ScrollView>
     <ProgressBar
-        android:id="@+id/progressBarPostByGallery"
+        android:id="@+id/progressBarEditContentByGallery"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_gravity="center"
         android:progressTint="@color/black"
         android:visibility="gone"/>
 </RelativeLayout>

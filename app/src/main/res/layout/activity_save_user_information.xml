@@ -6,6 +6,14 @@
     android:layout_height="match_parent"
     tools:context="com.thesis.application.echo.login_module.SaveUserInformation">
 
+    <LinearLayout
+        android:id="@+id/linearLayoutGrayBackgroundSaveUserInformation"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:background="@android:color/darker_gray"/>
+
     <ProgressBar
         android:id="@+id/progressBarSaveUserInformation"
         style="?android:attr/progressBarStyle"

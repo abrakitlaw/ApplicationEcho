@@ -8,9 +8,11 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +29,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private EditText email;
     private EditText password;
     private ProgressBar progressBarLogin;
+    private LinearLayout grayBackground;
 
     private FirebaseAuth mAuth;
 
@@ -44,6 +47,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         onFocusChangeListener(password);
 
         progressBarLogin = findViewById(R.id.progressBarLogin);
+        grayBackground = findViewById(R.id.linearLayoutGrayBackgroundLogin);
 
         TextView signUp = findViewById(R.id.textViewSignUp);
         TextView forgotPass = findViewById(R.id.textViewForgotPass);
@@ -103,11 +107,16 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         }
 
         progressBarLogin.setVisibility(View.VISIBLE);
+        grayBackground.setVisibility(View.VISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
         mAuth.signInWithEmailAndPassword(emailInputted, passInputted).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 progressBarLogin.setVisibility(View.GONE);
+                grayBackground.setVisibility(View.GONE);
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
                 if(task.isSuccessful()) {
                     finish();
                     Intent intent = new Intent(Login.this, MainHome.class);
@@ -118,6 +127,17 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 }
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        if(grayBackground.getVisibility() == View.VISIBLE) {
+            progressBarLogin.setVisibility(View.GONE);
+            grayBackground.setVisibility(View.GONE);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        }
     }
 
     public void onFocusChangeListener(EditText editText) {

@@ -5,10 +5,13 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -25,7 +28,8 @@ import com.thesis.application.echo.main_home_module.MainHome;
 public class RegisterUser extends AppCompatActivity implements View.OnClickListener {
 
     private ProgressBar progressBarRegister;
-    private EditText email, password;
+    private EditText email, password, confirmPassword;
+    private LinearLayout linearLayoutBackground;
 
     private DatabaseReference dbRefUser;
     private FirebaseAuth mAuth;
@@ -44,6 +48,9 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
         onFocusChangeListener(email);
 
         password = findViewById(R.id.editTextPasswordSignUp);
+        confirmPassword = findViewById(R.id.editTextConfirmPasswordSignUp);
+        linearLayoutBackground = findViewById(R.id.linearLayoutGrayBackgroundRegister);
+
         onFocusChangeListener(password);
 
         findViewById(R.id.btnRegister).setOnClickListener(this);
@@ -72,13 +79,18 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
     private void addUser() {
         final String emailUser = email.getText().toString().trim();
         final String passwordUser = password.getText().toString().trim();
+        final String confirmPasswordUser = confirmPassword.getText().toString().trim();
 
-        if (userRegisterValidation(emailUser, passwordUser)) {
+        if (userRegisterValidation(emailUser, passwordUser, confirmPasswordUser)) {
             progressBarRegister.setVisibility(View.VISIBLE);
-            mAuth.createUserWithEmailAndPassword(emailUser, passwordUser).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            linearLayoutBackground.setVisibility(View.VISIBLE);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            mAuth.createUserWithEmailAndPassword(emailUser, confirmPasswordUser).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     progressBarRegister.setVisibility(View.GONE);
+                    linearLayoutBackground.setVisibility(View.GONE);
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     if (task.isSuccessful()) {
                         goToMainHome();
                     } else {
@@ -100,9 +112,8 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
         finish();
     }
 
-    private boolean userRegisterValidation(String emailInputted, String passwordInputted) {
-        emailInputted = email.getText().toString().trim();
-        passwordInputted = password.getText().toString().trim();
+    private boolean userRegisterValidation(String emailInputted, String passwordInputted, String confirmPasswordInputted) {
+
         if (emailInputted.isEmpty()) {
             email.setError(getString(R.string.email_isEmpty));
             email.requestFocus();
@@ -123,7 +134,27 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
             password.requestFocus();
             return false;
         }
+        if(TextUtils.isEmpty(confirmPasswordInputted)) {
+            confirmPassword.setError(getString(R.string.confirm_password_required));
+            confirmPassword.requestFocus();
+            return false;
+        }
+        if(!confirmPasswordInputted.equals(passwordInputted)) {
+            confirmPassword.setError(getString(R.string.confirm_password_not_match));
+            confirmPassword.requestFocus();
+            return false;
+        }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (progressBarRegister.getVisibility() == View.VISIBLE){
+            progressBarRegister.setVisibility(View.GONE);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            linearLayoutBackground.setVisibility(View.GONE);
+        }
     }
 
     public void onFocusChangeListener(EditText editText) {
